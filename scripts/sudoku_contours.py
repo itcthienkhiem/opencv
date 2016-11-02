@@ -61,58 +61,13 @@ def main():
     image = cv2.imread('../images/sudoku.jpg', 0)
     blur = cv2.GaussianBlur(image,(11,11),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,5,2)
-    cv2.bitwise_not(thresh, thresh)
+    #cv2.bitwise_not(thresh, thresh)
 
     kernel = np.array([[0,1,0],[1,1,1],[0,1,0]], dtype=np.uint8)
-    dilateMain = cv2.dilate(thresh,kernel)
+    dilate = cv2.dilate(thresh,kernel)
 
-    height, width = dilateMain.shape[:2]
-    mask = np.zeros((height+2, width+2), np.uint8)
-
-    ''' provare con il flood maggiore, se non corrisponde ad una provare con
-        il secondo maggiore e cosi via '''
-
-    dilate = dilateMain.copy()
-    max_dim = max(height, width)
-
-    max_area = -1
-    for i in range(max_dim):
-        r = i%height
-        c = i%width
-        if dilate[r, c] == 255:
-            area, rect = cv2.floodFill(dilate, mask, (c,r), 64) # changes on mask
-            if area > max_area:
-                max_area = area
-                point = (c,r)
-
-        c = width-1-c
-        if dilate[r, c] == 255:
-            area, rect = cv2.floodFill(dilate, mask, (c,r), 64) # changes on mask
-            if area > max_area:
-                max_area = area
-                point = (c,r)
-
-    ''' provare a trovare il flood maggiore solo per diagonali o anche mediane '''
-
-    mask = np.zeros((height+2, width+2), np.uint8) # come funziona mask????
-    cv2.floodFill(dilate, mask, point, 255)
-
-    for r in range(height):
-        for c in range(width):
-            if dilate[r, c] == 64:
-                cv2.floodFill(dilate, mask, (c,r), 0)
-            if dilate[r, c] == 255:
-                if point[0] == c and point[1] == r:
-                    continue
-                cv2.floodFill(dilate, mask, (c,r), 0)
-
-
-    grid = cv2.erode(dilate, kernel)
-
-    #edges = cv2.Canny(dilate,100,200, L2gradient = True)
-    #cv2.imshow('edges', edges)
-
-    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    cv2.imshow('threshold', thresh)
+    contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
     max_area = -1
     cnt_max = None
@@ -121,15 +76,19 @@ def main():
         if area > max_area:
             max_area = area
             cnt_max = cnt
+    print(max_area)
+    cv2.drawContours(image, cnt_max, -1, (0,255,0), 3)
 
-    cv2.drawContours(mask, cnt_max, -1, 255, 3)
+    #grid = cv2.erode(dilate, kernel)
+
+    #edges = cv2.Canny(dilate,100,200, L2gradient = True)
+    #cv2.imshow('edges', edges)
     ''' trovare solo i contorni esterni '''
-
-    lines = cv2.HoughLines(grid,1,np.pi/180,150)
+    #lines = cv2.HoughLines(grid,1,np.pi/180,150)
 
     ''' migliorare funzione di merge '''
-    mergeRelatedLines(lines[0], image)
-    drawLines(lines[0], grid)
+    #mergeRelatedLines(lines[0], image)
+    #drawLines(lines[0], grid)
 
     ''' trovare intersezione per trovare angoli '''
     ''' ampliare immagine se angoli esterni '''
@@ -138,9 +97,7 @@ def main():
     ''' verificare se ci sono pedine/numeri -> identificarli '''
 
     cv2.imshow('source', image)
-    cv2.imshow('threshold', thresh)
-    cv2.imshow('mask', mask)
-    cv2.imshow('grid', grid)
+    #cv2.imshow('grid', grid)
 
     k = cv2.waitKey(0) & 0xFF
     if k == ord('s'):
