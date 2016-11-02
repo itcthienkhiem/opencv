@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<!-- saved from url=(0060)http://aishack.in/tutorials/sudoku-grabber-opencv-detection/ -->
+<html lang="env"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="keywords" content="">
+        <meta name="author" content="Utkarsh Sinha">
+        <link rel="shortcut icon" href="http://aishack.in/static/img/fav.gif">
+        <title> SuDoKu Grabber in OpenCV: Grid detection - AI Shack - Tutorials for OpenCV, computer vision, deep learning, image processing, neural networks and artificial intelligence.</title>
+        <link rel="stylesheet" href="./SuDoKu Grabber in OpenCV_files/styles.min.css">
+
+        <!-- for use while sharing -->
+        <meta name="title" content="Grid detection">
+        <meta name="description" content="">
+        <link rel="image_src" href="http://aishack.in/static/thumb/post-sudoku.jpg">
+        <meta property="og:image:url" content="http://aishack.in/static/thumb/post-sudoku.jpg">
+
+        
+            <script async="" src="./SuDoKu Grabber in OpenCV_files/analytics.js"></script><script id="facebook-jssdk" src="./SuDoKu Grabber in OpenCV_files/sdk.js"></script><script id="twitter-wjs" src="./SuDoKu Grabber in OpenCV_files/widgets.js"></script><script type="text/javascript" id="async-buttons" src="./SuDoKu Grabber in OpenCV_files/async-buttons.js"></script><script type="text/javascript">var switchTo5x=true;</script>
+            <script type="text/javascript" src="./SuDoKu Grabber in OpenCV_files/buttons.js"></script>
+            <script type="text/javascript" src="./SuDoKu Grabber in OpenCV_files/loader.js"></script>
+        
+
+    <script type="text/javascript" charset="utf-8" async="" src="./SuDoKu Grabber in OpenCV_files/button.4e56ff84e57afaf5af2506ef73ab8a88.js"></script><link rel="stylesheet" type="text/css" href="./SuDoKu Grabber in OpenCV_files/buttons.ab966a004186897711de4a5ed256c924.css"><link rel="stylesheet" type="text/css" href="./SuDoKu Grabber in OpenCV_files/hoverbuttons.6eab8de2ee93b309873157b6d3f977fe.css"><script type="text/javascript" src="./SuDoKu Grabber in OpenCV_files/hoverbuttons.035267d71d894482eb413e5bea488ff5.js"></script><script type="text/javascript" src="./SuDoKu Grabber in OpenCV_files/ga.js"></script></head>
+    <body>
+        <div class="container-fluid header-top">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    
+
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://aishack.in/"><span class="pull-left site-logo"></span> <strong>AI Shack</strong></a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="http://aishack.in/"><span class="glyphicon glyphicon-home"></span></a></li>
+        <li class="active"><a href="http://aishack.in/tutorials/"><span class="glyphicon glyphicon-th glyphicon-margin"></span>Tutorials</a></li>
+        <li><a href="http://aishack.in/contribute/"><span class="glyphicon glyphicon-pencil glyphicon-margin"></span>Contribute</a></li>
+        <li><a href="http://aishack.in/about/">About</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+
+                </div>
+            </nav>
+        </div>
+        <div class="container pad-bottom">
+
+            <div class="row">
+                
+                    <div class="col-md-9">
+                
+                    
+                        <ol class="breadcrumb">
+    <li><a href="http://aishack.in/"><span class="glyphicon glyphicon-home"></span></a></li>
+    
+        <li><a href="http://aishack.in/tutorials/">Tutorials</a></li>
+        
+            <li><a href="http://aishack.in/category/projects/">Projects</a></li>
+        
+        
+            
+                <li><a href="http://aishack.in/tutorials/sudoku-grabber-opencv-detection">SuDoKu Grabber in OpenCV</a></li>
+            
+            <li><a href="http://aishack.in/tutorials/sudoku-grabber-opencv-detection/">Grid detection</a></li>
+        
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</ol>
+
+                    
+                    
+    
+        
+            <img class="tut-post-image img-responsive" src="./SuDoKu Grabber in OpenCV_files/post-sudoku.jpg">
+        
+           <div class="fb-like" data-href="http://facebook.com/aishack" data-adapt-container-width="true" data-layout="standard" data-action="like" data-show-faces="true"></div> 
+        <hr>
+
+        
+            <h2>SuDoKu Grabber in OpenCV</h2>
+            <hr>
+        
+            <h2>Grid detection</h2>
+            
+                <div class="pull-right series-box-top">
+                    <p><strong>Series</strong>: SuDoKu Grabber in OpenCV:</p>
+                    <ol>
+                        
+                            <li>
+                                
+                                    <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-plot/">The Plot</a>
+                                
+                            </li>
+                        
+                            <li>
+                                
+                                    <strong>Grid detection</strong>
+                                
+                            </li>
+                        
+                            <li>
+                                
+                                    <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-extracting-grid/">Extracting the grid</a>
+                                
+                            </li>
+                        
+                            <li>
+                                
+                                    <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-extracting-digits/">Extracting digits</a>
+                                
+                            </li>
+                        
+                            <li>
+                                
+                                    <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-recognizing-digits/">Recognizing digits</a>
+                                
+                            </li>
+                        
+                    </ol>
+                </div>
+            
+
+
+
+        <div class="tutorial-content">
+            <style scoped="">img.latex-inline { vertical-align: middle; }</style>
+<p>In this post,we 'll look at detecting a SuDoKu puzzle. This include all preprocessing done on the image: filtering the image to ensure we're not affected too much by noise. Also, segmenting the image is dealt with here. I've used a weird segmentation approach, so you might want to have a look at that. By the end of this post, you'll have several possible lines that describe the puzzle grid.</p>
+<h2>Getting started</h2>
+<p>Start by creating a new project in your IDE. If you're not sure how that is done, have a look at the <a href="http://aishack.in/tutorials/using-opencv-windows/">Getting started with OpenCV</a> guide.</p>
+<p>Also, I'll use <a href="http://aishack.in/tutorials/opencvs-interface/">OpenCV's C++ interface</a>. So make sure you have at least OpenCV 2.0 installed on your computer.</p>
+<p>Link your project to the OpenCV library files and include the following in your main file: </p>
+<div class="codehilite"><pre><span class="cp">#include &lt;cv.h&gt;</span>
+<span class="cp">#include &lt;highgui.h&gt;</span>
+
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>For now, we'll use a static image for detecting a puzzle. So we load an image: </p>
+<div class="codehilite"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Mat</span> <span class="n">sudoku</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="s">"sudoku.jpg"</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</pre></div>
+
+
+<figure><img alt="" src="./SuDoKu Grabber in OpenCV_files/sudoku-original.jpg">  <figcaption>
+<p>An image with a sudoku puzzle  </p>
+</figcaption>
+</figure>
+<p>Note that we load the image in grayscale mode. We don't want to bother with the colour information, so just skip it. Next, we create a blank image of the same size. This image will hold the actual outer box of puzzle: </p>
+<div class="codehilite"><pre>    <span class="n">Mat</span> <span class="n">outerBox</span> <span class="o">=</span> <span class="n">Mat</span><span class="p">(</span><span class="n">sudoku</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">CV_8UC1</span><span class="p">);</span>
+</pre></div>
+
+
+<h2>Preprocessing the image</h2>
+<p>Blur the image a little. This smooths out the noise a bit and makes extracting the grid lines easier. </p>
+<div class="codehilite"><pre>    <span class="n">GaussianBlur</span><span class="p">(</span><span class="n">sudoku</span><span class="p">,</span> <span class="n">sudoku</span><span class="p">,</span> <span class="n">Size</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+</pre></div>
+
+
+<p>With the noise smoothed out, we can now <a href="http://aishack.in/tutorials/thresholding/">threshold the image</a>. The image can have varying illumination levels, so a good choice for a thresholding algorithm would be an adaptive threshold. It calculates a threshold level several small windows in the image. This threshold level is calculated using the mean level in the window. So it keeps things illumination independent.</p>
+<div class="codehilite"><pre>    <span class="n">adaptiveThreshold</span><span class="p">(</span><span class="n">sudoku</span><span class="p">,</span> <span class="n">outerBox</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">ADAPTIVE_THRESH_MEAN_C</span><span class="p">,</span> <span class="n">THRESH_BINARY</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+
+
+<p>It calculates a mean over a 5x5 window and subtracts 2 from the mean. This is the threshold level for every pixel.</p>
+<p>Since we're interested in the borders, and they are black, we invert the image <em>outerBox</em>. Then, the borders of the puzzles are white (along with other noise). </p>
+<div class="codehilite"><pre>    <span class="n">bitwise_not</span><span class="p">(</span><span class="n">outerBox</span><span class="p">,</span> <span class="n">outerBox</span><span class="p">);</span>
+</pre></div>
+
+
+<p>This thresholding operation can disconnect certain <a href="http://aishack.in/tutorials/pixel-neighbourhoods-connectedness/">connected parts</a> (like lines). So dilating the image once will fill up any small "cracks" that might have crept in. </p>
+<div class="codehilite"><pre>    <span class="n">Mat</span> <span class="n">kernel</span> <span class="o">=</span> <span class="p">(</span><span class="n">Mat_</span><span class="o">&lt;</span><span class="n">uchar</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+    <span class="n">dilate</span><span class="p">(</span><span class="n">outerBox</span><span class="p">,</span> <span class="n">outerBox</span><span class="p">,</span> <span class="n">kernel</span><span class="p">);</span>
+</pre></div>
+
+
+<p>Note that I've used a plus shaped structuring element here (the <em>kernel</em> matrix).</p>
+<figure><img alt="After inverting and dilating the puzzle" src="./SuDoKu Grabber in OpenCV_files/sudoku-inverted-dilated.jpg">  <figcaption>
+<p>After inverting and dilating the puzzle  </p>
+</figcaption>
+</figure>
+<h2>Finding the biggest blob</h2>
+<p>For this project, I didn't want to use any library for blobs. So I made a little hack for detecting blobs. If you want, you can use cvBlobsLib.</p>
+<p>Here's the technique I use. First, I use the floodfill command. This command returns a bounding rectangle of the pixels it filled. We've assumed the biggest thing in the picture to be the puzzle. So the biggest blob should have be the puzzle. Since it is the biggest, it will have the biggest bounding box as well. So we find the biggest bounding box, and save the location where we did the flood fill. </p>
+<div class="codehilite"><pre>    <span class="kt">int</span> <span class="n">count</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">max</span><span class="o">=-</span><span class="mi">1</span><span class="p">;</span>
+
+    <span class="n">Point</span> <span class="n">maxPt</span><span class="p">;</span>
+
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">y</span><span class="o">&lt;</span><span class="n">outerBox</span><span class="p">.</span><span class="n">size</span><span class="p">().</span><span class="n">height</span><span class="p">;</span><span class="n">y</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">uchar</span> <span class="o">*</span><span class="n">row</span> <span class="o">=</span> <span class="n">outerBox</span><span class="p">.</span><span class="n">ptr</span><span class="p">(</span><span class="n">y</span><span class="p">);</span>
+        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">x</span><span class="o">&lt;</span><span class="n">outerBox</span><span class="p">.</span><span class="n">size</span><span class="p">().</span><span class="n">width</span><span class="p">;</span><span class="n">x</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">128</span><span class="p">)</span>
+            <span class="p">{</span>
+
+                 <span class="kt">int</span> <span class="n">area</span> <span class="o">=</span> <span class="n">floodFill</span><span class="p">(</span><span class="n">outerBox</span><span class="p">,</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="n">CV_RGB</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">64</span><span class="p">));</span>
+
+                 <span class="k">if</span><span class="p">(</span><span class="n">area</span><span class="o">&gt;</span><span class="n">max</span><span class="p">)</span>
+                 <span class="p">{</span>
+                     <span class="n">maxPt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+                     <span class="n">max</span> <span class="o">=</span> <span class="n">area</span><span class="p">;</span>
+                 <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+</pre></div>
+
+
+<figure><img alt="Flood filling each blob (in progress)" src="./SuDoKu Grabber in OpenCV_files/sudoku-blobfilling-in-progress1.jpg">  <figcaption>
+<p>Flood filling each blob (in progress)  </p>
+</figcaption>
+</figure>
+<p>We iterate through the image. The &gt;=128 condition is to ensure that only the white parts are flooded. Whenever we encounter such a part, we flood it with a dark gray colour (gray level 64). So in the future, we won't be reflooding these blobs. And whenever we encounter a big blob, we note the current point and the area it has.</p>
+<p>Now, we have several blobs filled with a dark gray colour (level 64). And we also know the point what produces a blob with maximum area. So we floodfill that point with white: </p>
+<div class="codehilite"><pre>    <span class="n">floodFill</span><span class="p">(</span><span class="n">outerBox</span><span class="p">,</span> <span class="n">maxPt</span><span class="p">,</span> <span class="n">CV_RGB</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">));</span>
+</pre></div>
+
+
+<p>Now, the biggest blob is white. We need to turn the other blobs black. We do that here: </p>
+<div class="codehilite"><pre>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">y</span><span class="o">&lt;</span><span class="n">outerBox</span><span class="p">.</span><span class="n">size</span><span class="p">().</span><span class="n">height</span><span class="p">;</span><span class="n">y</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">uchar</span> <span class="o">*</span><span class="n">row</span> <span class="o">=</span> <span class="n">outerBox</span><span class="p">.</span><span class="n">ptr</span><span class="p">(</span><span class="n">y</span><span class="p">);</span>
+        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">x</span><span class="o">&lt;</span><span class="n">outerBox</span><span class="p">.</span><span class="n">size</span><span class="p">().</span><span class="n">width</span><span class="p">;</span><span class="n">x</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">==</span><span class="mi">64</span> <span class="o">&amp;&amp;</span> <span class="n">x</span><span class="o">!=</span><span class="n">maxPt</span><span class="p">.</span><span class="n">x</span> <span class="o">&amp;&amp;</span> <span class="n">y</span><span class="o">!=</span><span class="n">maxPt</span><span class="p">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="kt">int</span> <span class="n">area</span> <span class="o">=</span> <span class="n">floodFill</span><span class="p">(</span><span class="n">outerBox</span><span class="p">,</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">),</span> <span class="n">CV_RGB</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">));</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+
+
+<p>Wherever a dark gray point is enountered, it is flooded with black, effectively "hiding" it.</p>
+<p>Because we had dilated the image earlier, we'll "restore" it a bit by eroding it: </p>
+<div class="codehilite"><pre>    <span class="n">erode</span><span class="p">(</span><span class="n">outerBox</span><span class="p">,</span> <span class="n">outerBox</span><span class="p">,</span> <span class="n">kernel</span><span class="p">);</span>
+    <span class="n">imshow</span><span class="p">(</span><span class="s">"thresholded"</span><span class="p">,</span> <span class="n">outerBox</span><span class="p">);</span>
+</pre></div>
+
+
+<figure><img alt="The biggest blob, after morphological erosion" src="./SuDoKu Grabber in OpenCV_files/sudoku-final-blob.jpg">  <figcaption>
+<p>The biggest blob, after morphological erosion  </p>
+</figcaption>
+</figure>
+<h2>Detecting lines</h2>
+<p>At this point, we have a single blob. Now its time to find lines. This is done with the <a href="http://aishack.in/tutorials/hough-transform-basics/">Hough transform</a>. OpenCV comes with it. So a line of code is all that's needed: </p>
+<div class="codehilite"><pre>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">Vec2f</span><span class="o">&gt;</span> <span class="n">lines</span><span class="p">;</span>
+    <span class="n">HoughLines</span><span class="p">(</span><span class="n">outerBox</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">CV_PI</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span> <span class="mi">200</span><span class="p">);</span>
+</pre></div>
+
+
+<p>For now, we'll draw each line. Just to see if the results too now are good enough or not: </p>
+<div class="codehilite"><pre>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">lines</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">drawLine</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">outerBox</span><span class="p">,</span> <span class="n">CV_RGB</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">128</span><span class="p">));</span>
+    <span class="p">}</span>
+</pre></div>
+
+
+<p>Where, the drawLine function is: </p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">drawLine</span><span class="p">(</span><span class="n">Vec2f</span> <span class="n">line</span><span class="p">,</span> <span class="n">Mat</span> <span class="o">&amp;</span><span class="n">img</span><span class="p">,</span> <span class="n">Scalar</span> <span class="n">rgb</span> <span class="o">=</span> <span class="n">CV_RGB</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">float</span> <span class="n">m</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">tan</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+        <span class="kt">float</span> <span class="n">c</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">sin</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+        <span class="n">cv</span><span class="o">::</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">().</span><span class="n">width</span><span class="p">,</span> <span class="n">m</span><span class="o">*</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">().</span><span class="n">width</span><span class="o">+</span><span class="n">c</span><span class="p">),</span> <span class="n">rgb</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="n">cv</span><span class="o">::</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">Point</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">().</span><span class="n">height</span><span class="p">),</span> <span class="n">rgb</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+
+
+<p>This function takes a line in the normal form (a distance from the original and angle with the x-axis). Then, if the line is vertical (infinite slope), it draws the line appropariately. If not, it finds two points on the line and draws a line accordingly.</p>
+<figure><img alt="Lines detected by the hough transform" src="./SuDoKu Grabber in OpenCV_files/sudoku-possible-lines.jpg">  <figcaption>
+<p>Lines detected by the Hough transform  </p>
+</figcaption>
+</figure>
+<p>As you can see, each physical line has several possible approximations. This is usually because the physical line is thick. So, just these lines aren't enough for figuring out where the puzzle is located. We'll have to do some math with these lines. But we'll do that in the next post. I think this one has been long enough. </p>
+<h2>Summary</h2>
+<p>Today, we implemented the first half of the SuDoKu grabber. We've been able to detect the physical borders of the puzzle till now, but the results aren't usable directly. We'll do a little math with them and fix that next.</p>
+        </div>
+
+        
+            <hr>
+            <h2>More in the series</h2>
+            <p>This tutorial is part of a series called <strong>SuDoKu Grabber in OpenCV</strong>:</p>
+            <ol>
+                
+                    <li>
+                        
+                            <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-plot/">The Plot</a>
+                        
+                    </li>
+                
+                    <li>
+                        
+                            <strong>Grid detection</strong>
+                        
+                    </li>
+                
+                    <li>
+                        
+                            <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-extracting-grid/">Extracting the grid</a>
+                        
+                    </li>
+                
+                    <li>
+                        
+                            <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-extracting-digits/">Extracting digits</a>
+                        
+                    </li>
+                
+                    <li>
+                        
+                            <a href="http://aishack.in/tutorials/sudoku-grabber-opencv-recognizing-digits/">Recognizing digits</a>
+                        
+                    </li>
+                
+            </ol>
+        
+
+        
+        
+
+        <hr>
+       <div class="fb-like" data-href="http://facebook.com/aishack" data-adapt-container-width="true" data-layout="standard" data-action="like" data-show-faces="true"></div> 
+        <hr>
+
+        
+        
+            <hr>
+            <div class="clearfix">
+                <a href="http://aishack.in/opencv-blueprints"><img class="pull-left" src="./SuDoKu Grabber in OpenCV_files/book-banner.png"></a>
+                <h2><strong><a href="http://aishack.in/opencv-blueprints">OpenCV 3 Blueprints</a></strong></h2>
+                <p>Learn how to identify <strong>face expressions</strong>, <strong>fingerprints</strong>, setup automated <strong>camera traps</strong>, stabilize mobile video with <strong>gyroscopes</strong> and use the <strong>Android NDK</strong></p>
+                <p>The book is packed with the fundamentals of computer vision and will get you started on just the right track.</p>
+                <p><a class="btn btn-primary btn-blueprints pull-right" href="http://aishack.in/opencv-blueprints">Learn more about the book</a></p>
+            </div>
+        
+
+        
+        <div class="well">
+            <div class="col-sm-2"><a href="http://utkarshsinha.com/" target="_blank"><img class="img-circle" src="./SuDoKu Grabber in OpenCV_files/066eac5a12b429666971cd4ae450f169"> </a></div>
+            <div class="col-sm-10">Utkarsh Sinha created AI Shack in 2010 and has since been working on computer vision and related fields. He is currently at Carnegie Mellon University studying computer vision.</div>
+            <div class="clearfix"></div>
+        </div>
+
+    
+
+                </div>
+                
+                    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg sidebar">
+    <div class="panel panel-default">
+        <div class="panel-heading">Search</div>
+        <div class="panel-body">
+            <form class="form-inline form-search" role="form" method="get" action="http://aishack.in/search">
+                <div class="form-group has-feedback">
+                    <input placeholder="Search" type="text" class="form-control" name="q" id="q">
+                    <input type="hidden" name="models" value="aishack.tutorial">
+                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+     
+        <div class="panel panel-default">
+            <div class="panel-heading">OpenCV Blueprints</div>
+            <div class="panel-body">
+                <center><a href="http://aishack.in/opencv-blueprints/"><img src="./SuDoKu Grabber in OpenCV_files/opencv-blueprints.jpg"></a></center>
+            </div>
+        </div>
+    
+
+    
+        <div class="panel panel-default">
+            <div class="panel-heading">Name that dataset!</div>
+            <div class="panel-body">
+                <p>Think you can differentiate between the different computer vision datasets? <b>Play the game</b> and find out!</p>
+                <a href="http://aishack.in/name-that-dataset"><button class="btn btn-primary">Play Name that Dataset!</button></a>
+            </div>
+        </div>
+    
+
+    
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Popular tutorials</div>
+        <div class="panel-body">
+            <table class="table">
+            
+                    <tbody><tr><td><a href="http://aishack.in/tutorials/sift-scale-invariant-feature-transform-eliminate-low-contrast/">Getting rid of low contrast keypoints</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/dominant-color/">Eigenvectors</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/sift-scale-invariant-feature-transform-log-approximation/">LoG approximations</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/tracking-colored-objects-opencv/">Tracking colored objects in OpenCV</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/7-unique-neural-network-architectures/">7 unique neural network architectures</a></td></tr>
+            
+            </tbody></table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="col-md-4 visible-xs visible-sm hidden-md hidden-lg sidebar-bottom">
+    <div class="panel panel-default">
+        <div class="panel-heading">Search</div>
+        <div class="panel-body">
+            <form class="form-inline form-search" role="form" method="get" action="http://aishack.in/search">
+                <div class="form-group has-feedback">
+                    <input placeholder="Search" type="text" class="form-control" name="q" id="q">
+                    <input type="hidden" name="models" value="aishack.tutorial">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Popular tutorials</div>
+        <div class="panel-body">
+            <table class="table">
+            
+                    <tbody><tr><td><a href="http://aishack.in/tutorials/sift-scale-invariant-feature-transform-eliminate-low-contrast/">Getting rid of low contrast keypoints</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/dominant-color/">Eigenvectors</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/sift-scale-invariant-feature-transform-log-approximation/">LoG approximations</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/tracking-colored-objects-opencv/">Tracking colored objects in OpenCV</a></td></tr>
+            
+                    <tr><td><a href="http://aishack.in/tutorials/7-unique-neural-network-architectures/">7 unique neural network architectures</a></td></tr>
+            
+            </tbody></table>
+        </div>
+    </div>
+
+</div>
+
+                
+            </div>
+        </div>
+        <div class="container">
+            
+
+<div class="row footer">
+    <div class="col-md-offset-2 col-md-3">
+        <img src="./SuDoKu Grabber in OpenCV_files/logo-footer-left.png" class="pull-left logo">
+        <h4>About AI Shack</h4>
+        <p>Learn about the latest in AI technology with in-depth tutorials on vision and learning!</p>
+        <a class="pull-right" href="http://aishack.in/about/">More...</a>
+        <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" class="twitter-follow-button twitter-follow-button-rendered" title="Twitter Follow Button" src="./SuDoKu Grabber in OpenCV_files/follow_button.39f7ee9fffbd122b7a37a520dbdaebc6.en.html" style="position: static; visibility: visible; width: 162px; height: 28px;" data-screen-name="utkarshsiha"></iframe>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    </div>
+    <div class="col-md-3 getting-started">
+        <h4>Get started</h4>
+        <ul>
+            <li><a href="http://aishack.in/tracks/opencv-basics/">Get started with OpenCV</a></li>
+            <li><a href="http://aishack.in/tutorials/tracking-colored-objects-opencv/">Track a specific color on video</a></li>
+            <li><a href="http://aishack.in/tracks/image-processing-algorithms-level-1/">Learn basic image processing algorithms</a></li>
+            <li><a href="http://aishack.in/tutorials/single-neuron-dictomizer/">How to build artificial neurons?</a></li>
+            <li><a href="http://github.com/aishack/">Look at some source code</a></li>
+        </ul>
+    </div>
+    <div class="col-md-4">
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.4";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+
+        <div class="fb-page" data-href="https://www.facebook.com/aishack" data-width="380" data-small-header="true" data-adapt-container-width="false" data-hide-cover="true" data-show-facepile="true" data-show-posts="false"><div class="fb-xfbml-parse-ignore"><blockquote cite="./SuDoKu Grabber in OpenCV_files/aishack"><a href="./SuDoKu Grabber in OpenCV_files/aishack">AI Shack</a></blockquote></div></div>
+        </div>
+    <!--div class='col-md-5'>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>AI Shack on Facebook</div>
+            <div class='facebook-liker-nopadding panel-body'>
+                <iframe src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Faishack&amp;width=360&amp;height=258&amp;colorscheme=light&amp;show_faces=true&amp;header=false&amp;stream=false&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:360px; height:258px;" allowTransparency="true"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class='col-md-3'>
+        <div class='panel panel-default'>
+            <div class='panel-heading'><span class='glyphicon glyphicon-user'></span> Contact</div>
+            <div class='panel-body'><p>You can contact me through the internet over the following channels:</p>
+            <ul class='list-unstyled'>
+                <li><a href='http://facebook.com/aishack/' target='_blank'><span class='ico ico-facebook'></span>Facebook</a></li>
+                <li><a href='http://twitter.com/aishack' target='_blank'><span class='ico ico-twitter'></span>Twitter</a></li>
+                <li><a href='http://github.com/aishack' target='_blank'><span class='ico ico-github'></span>Github</a></li>
+                <li><a href='mailto:utkarsh@utkarshsinha.com'><span class='ico ico-email'></span>Email</a></li>
+            </ul>
+            </div>
+        </div>
+    </div>
+    <div class='col-md-4'>
+        <div class='panel panel-default'>
+            <div class='panel-heading'><span class='glyphicon glyphicon-question-sign'></span> Where to start?</div>
+            <div class='panel-body'>
+                <p>So you want to get started with AI but you're not sure where. Here are some links to get you started:</p>
+                <ul>
+                    <li><a href='/tracks/opencv-basics/'>Get started with OpenCV</a></li>
+                    <li><a href='/tutorials/tracking-colored-objects-in-opencv/'>Track a specific color on video</a></li>
+                    <li><a href='/tracks/image-processing-algorithms-level-1/'>Learn basic image processing algorithms</a></li>
+                    <li><a href='/tutorials/a-single-neuron-dictomizer/'>How to build artificial neurons?</a></li>
+                    <li><a href='http://github.com/aishack/'>Look at some source code</a></li>
+                </ul>
+            </div>
+        </div>
+    </div-->
+</div>
+
+        </div>
+        <div class="container-fluid footer-bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="creator">Created by <a href="http://utkarshsinha.com/" target="_blank">Utkarsh Sinha</a></p>
+                </div>
+            </div>
+        </div>
+        <!--script src='/static/js/jquery-1.11.1.min.js'></script>
+        <script src='/static/js/bootstrap.min.js'></script>
+        <script src='/static/js/bootstrap-editable.min.js'></script-->
+        <script src="./SuDoKu Grabber in OpenCV_files/bundle.min.js"></script>
+        
+            <script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-587551-5', 'auto');
+              ga('send', 'pageview');
+
+            </script>
+        
+        <script>
+        function gotoTop() {
+            var targetOffset = $('body').offset().top;
+            $('html,body').animate({scrollTop: targetOffset}, 1000);
+            return false;
+        }
+        $(document).ready(function() {
+            $("#btn-signup").tooltip({placement: 'top', title: 'Signup, track your progress, take quizzes.'});
+            $('.to-top').click(gotoTop);
+        });
+        
+        
+        </script>
+
+
+        
+            <script type="text/javascript">stLight.options({publisher: "46a0c3c5-b39e-40da-a153-3445ee34a6f6", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+            <script>
+            var options={ "publisher": "46a0c3c5-b39e-40da-a153-3445ee34a6f6", "position": "left", "ad": { "visible": false, "openDelay": 5, "closeDelay": 0}, "chicklets": { "items": ["facebook", "twitter", "linkedin", "reddit", "googleplus", "evernote", "pocket", "pinterest", "sharethis", "email"]}};
+            var st_hover_widget = new sharethis.widgets.hoverbuttons(options);
+            </script>
+        
+    
+
+</div><iframe id="stSegmentFrame" name="stSegmentFrame" src="./SuDoKu Grabber in OpenCV_files/getSegment.html" frameborder="0" scrolling="no" width="0px" height="0px" style="display:none;"></iframe><div id="stwrapper" class="stwrapper stwrapper5x" style="display: none;"><iframe allowtransparency="true" id="stLframe" class="stLframe" name="stLframe" frameborder="0" scrolling="no" src="./SuDoKu Grabber in OpenCV_files/index.68c7e8c4afa805645acdc854b11ea64b.html"></iframe></div><div id="stOverlay" onclick="javascript:stWidget.closeWidget();"></div><iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" src="./SuDoKu Grabber in OpenCV_files/saved_resource.html"></iframe><div id="sthoverbuttons" class="sthoverbuttons-pos-left"><div id="sthoverbuttons-background" class="sthoverbuttons-background-l"><div id="sthoverbuttons-top" class="sthoverbuttons-top-l">&nbsp;</div><div id="sthoverbuttons-shade" class="sthoverbuttons-shade-l">&nbsp;</div><div id="sthoverbuttons-bottom" class="sthoverbuttons-bottom-l">&nbsp;</div></div><div id="sthoverbuttonsMain" class="sthoverbuttonsMain-l"><div class="sthoverbuttons-label"><span>Share</span></div><div class="sthoverbuttons-chicklets"><span class="st_facebook_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/facebook_32.png&quot;);"></span></span></span><span class="st_twitter_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/twitter_32.png&quot;);"></span></span></span><span class="st_linkedin_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/linkedin_32.png&quot;);"></span></span></span><span class="st_reddit_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/reddit_32.png&quot;);"></span></span></span><span class="st_googleplus_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/googleplus_32.png&quot;);"></span></span></span><span class="st_evernote_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/evernote_32.png&quot;);"></span></span></span><span class="st_pocket_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/pocket_32.png&quot;);"></span></span></span><span class="st_pinterest_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/pinterest_32.png&quot;);"></span></span></span><span class="st_sharethis_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/sharethis_32.png&quot;);"></span></span></span><span class="st_email_large" style="display:block; height: 35px; float:left;" displaytext="" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span class="stLarge" style="background-image: url(&quot;http://w.sharethis.com/images/email_32.png&quot;);"></span></span></span></div></div></div></body></html>
