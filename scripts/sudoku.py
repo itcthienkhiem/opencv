@@ -110,25 +110,34 @@ def main(image_src='sudoku.jpg'):
     #edges = cv2.Canny(dilate,100,200, L2gradient = True)
     #cv2.imshow('edges', edges)
 
-    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
     cnt_max = max(contours, key=cv2.contourArea)
 
-    cv2.drawContours(mask, cnt_max, -1, 255, 3)
+    perimeter = cv2.arcLength(cnt_max, True)
+    print(perimeter)
+    approx = cv2.approxPolyDP(cnt_max, 0.04 * perimeter, True)
+    print(approx)
+    print(len(approx))
 
-    corners = cv2.goodFeaturesToTrack(mask,4,0.1,10)
-    corners = np.int0(corners)
+    cv2.drawContours(mask, cnt_max, -1, 255, 1)
+    for point in approx:
+        point = point[0]
+        cv2.circle(mask, (point[0],point[1]),   8, 255, -1)
 
-    for i in corners:
-        x,y = i.ravel()
-        cv2.circle(mask,(x,y),5,255,-1)
-
-    rect = cv2.minAreaRect(cnt_max) # (centox, centroy), (w,h), angolo
-    print(rect)
-    box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-    print(box)
-    box = np.int0(box)
-    cv2.drawContours(mask,[box],0,64,2)
+    # corners = cv2.goodFeaturesToTrack(mask,4,0.1,10)
+    # corners = np.int0(corners)
+    #
+    # for i in corners:
+    #     x,y = i.ravel()
+    #     cv2.circle(mask,(x,y),5,255,-1)
+    #
+    # rect = cv2.minAreaRect(cnt_max) # (centox, centroy), (w,h), angolo
+    # print(rect)
+    # box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
+    # print(box)
+    # box = np.int0(box)
+    # cv2.drawContours(mask,[box],0,64,2)
 
     # rect_w, rect_h = map(int, rect[1])
     # l = max(rect_w, rect_h)
@@ -152,15 +161,15 @@ def main(image_src='sudoku.jpg'):
     # cv2.circle(grid, extBot,    8, 255, -1)
     ''' trovare solo i contorni esterni '''
 
-    # lines = cv2.HoughLines(grid,1,np.pi/180,150)
+    # lines = cv2.HoughLines(grid,1,np.pi/180,200)
     #
     # ''' migliorare funzione di merge '''
     # mergeRelatedLines(lines[0], image)
-    # #drawLines(lines[0], grid)
-    #
-    # #cv2.circle(grid,(rect[0], rect[3]), 10, 255, -1)
-    # #cv2.circle(grid,(rect[2], rect[1]), 10, 255, -1)
-    #
+    # drawLines(lines[0], mask)
+
+    #cv2.circle(grid,(rect[0], rect[3]), 10, 255, -1)
+    #cv2.circle(grid,(rect[2], rect[1]), 10, 255, -1)
+
 
 
     ''' trovare intersezione per trovare angoli '''
