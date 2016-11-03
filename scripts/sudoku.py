@@ -110,15 +110,34 @@ def main(image_src='sudoku.jpg'):
     #edges = cv2.Canny(dilate,100,200, L2gradient = True)
     #cv2.imshow('edges', edges)
 
-    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 
     cnt_max = max(contours, key=cv2.contourArea)
 
-    rect = cv2.minAreaRect(cnt_max)
+    cv2.drawContours(mask, cnt_max, -1, 255, 3)
+
+    corners = cv2.goodFeaturesToTrack(mask,4,0.1,10)
+    corners = np.int0(corners)
+
+    for i in corners:
+        x,y = i.ravel()
+        cv2.circle(mask,(x,y),5,255,-1)
+
+    rect = cv2.minAreaRect(cnt_max) # (centox, centroy), (w,h), angolo
     print(rect)
-    box = cv2.cv.BoxPoints(rect)
+    box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
+    print(box)
     box = np.int0(box)
-    cv2.drawContours(grid,[box],0,64,2)
+    cv2.drawContours(mask,[box],0,64,2)
+
+    # rect_w, rect_h = map(int, rect[1])
+    # l = max(rect_w, rect_h)
+    #
+    # pts1 = np.float32([box[1], box[2], box[0], box[3]])
+    # pts2 = np.float32([[0,0], [l-1, 0], [0,l-1], [l-1, l-1]])
+    # M = cv2.getPerspectiveTransform(pts1,pts2)
+    # dst = cv2.warpPerspective(grid,M,(l,l))
+    # cv2.imshow('distors', dst)
 
     # # trovo punti estremi (angoli) del contorno
     # extLeft = tuple(cnt_max[cnt_max[:, :, 0].argmin()][0])
@@ -142,12 +161,7 @@ def main(image_src='sudoku.jpg'):
     # #cv2.circle(grid,(rect[0], rect[3]), 10, 255, -1)
     # #cv2.circle(grid,(rect[2], rect[1]), 10, 255, -1)
     #
-    # corners = cv2.goodFeaturesToTrack(grid,16,0.1,10)
-    # corners = np.int0(corners)
-    #
-    # for i in corners:
-    #     x,y = i.ravel()
-    #     cv2.circle(grid,(x,y),5,255,-1)
+
 
     ''' trovare intersezione per trovare angoli '''
     ''' ampliare immagine se angoli esterni '''
