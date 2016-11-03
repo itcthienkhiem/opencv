@@ -36,29 +36,27 @@ def mergeRelatedLines(lines, image):
             if (abs(line2[0]-line[0])<20 and abs(line2[1]-line[1])<np.pi*10/180):
                 p = line2[0];
                 theta = line2[1]
-
-                if (theta > np.pi*45/180 and theta < np.pi*135/180):
-                    pt1 = [0, p/math.sin(theta)]
-                    pt2 = [image.shape[1], -image.shape[1]/math.tan(theta)+p/math.sin(theta)]
-                else:
-                    try:
+                try:
+                    if (theta > np.pi*45/180 and theta < np.pi*135/180):
+                        pt1 = [0, p/math.sin(theta)]
+                        pt2 = [image.shape[1], -image.shape[1]/math.tan(theta)+p/math.sin(theta)]
+                    else:
                         pt1 = [p/math.cos(theta), 0]
                         pt2 = [-image.shape[0]/math.tan(theta)+p/math.cos(theta), image.shape[0]]
-                    except:
-                        pass
 
-                if  (pt1[0]-pt1current[0])**2 + (pt1[1]-pt1current[1])**2 < 200 and \
-                    (pt2[0]-pt2current[0])**2 + (pt2[1]-pt2current[1])**2 < 200 :
+                    if  (pt1[0]-pt1current[0])**2 + (pt1[1]-pt1current[1])**2 < 200 and \
+                        (pt2[0]-pt2current[0])**2 + (pt2[1]-pt2current[1])**2 < 200 :
 
-                    lines[i1][0] = (line[0]+line2[0])/2
-                    lines[i1][1] = (line[1]+line2[1])/2
+                        lines[i1][0] = (line[0]+line2[0])/2
+                        lines[i1][1] = (line[1]+line2[1])/2
 
-                    lines[i2][0] = 0
-                    lines[i2][1] = -100
+                        lines[i2][0] = 0
+                        lines[i2][1] = -100
+                except:
+                    pass
 
-
-def main():
-    image = cv2.imread('../images/sudoku.jpg', 0)
+def main(image_src='sudoku.jpg'):
+    image = cv2.imread('../images/%s'%image_src, 0)
     blur = cv2.GaussianBlur(image,(11,11),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,5,2)
     cv2.bitwise_not(thresh, thresh)
@@ -95,7 +93,7 @@ def main():
     ''' provare a trovare il flood maggiore solo per diagonali o anche mediane '''
 
     mask = np.zeros((height+2, width+2), np.uint8) # come funziona mask????
-    cv2.floodFill(dilate, mask, point, 255)
+    area, rect = cv2.floodFill(dilate, mask, point, 255)
 
     for r in range(height):
         for c in range(width):
@@ -114,22 +112,42 @@ def main():
 
     contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-    max_area = -1
-    cnt_max = None
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        if area > max_area:
-            max_area = area
-            cnt_max = cnt
+    cnt_max = max(contours, key=cv2.contourArea)
 
-    cv2.drawContours(mask, cnt_max, -1, 255, 3)
+    rect = cv2.minAreaRect(cnt_max)
+    print(rect)
+    box = cv2.cv.BoxPoints(rect)
+    box = np.int0(box)
+    cv2.drawContours(grid,[box],0,64,2)
+
+    # # trovo punti estremi (angoli) del contorno
+    # extLeft = tuple(cnt_max[cnt_max[:, :, 0].argmin()][0])
+    # extRight = tuple(cnt_max[cnt_max[:, :, 0].argmax()][0])
+    # extTop = tuple(cnt_max[cnt_max[:, :, 1].argmin()][0])
+    # extBot = tuple(cnt_max[cnt_max[:, :, 1].argmax()][0])
+    # #cv2.drawContours(mask, cnt_max, -1, 255, 3)
+    #
+    # cv2.circle(grid, extLeft,   8, 255, -1)
+    # cv2.circle(grid, extRight,  8, 255, -1)
+    # cv2.circle(grid, extTop,    8, 255, -1)
+    # cv2.circle(grid, extBot,    8, 255, -1)
     ''' trovare solo i contorni esterni '''
 
-    lines = cv2.HoughLines(grid,1,np.pi/180,150)
-
-    ''' migliorare funzione di merge '''
-    mergeRelatedLines(lines[0], image)
-    drawLines(lines[0], grid)
+    # lines = cv2.HoughLines(grid,1,np.pi/180,150)
+    #
+    # ''' migliorare funzione di merge '''
+    # mergeRelatedLines(lines[0], image)
+    # #drawLines(lines[0], grid)
+    #
+    # #cv2.circle(grid,(rect[0], rect[3]), 10, 255, -1)
+    # #cv2.circle(grid,(rect[2], rect[1]), 10, 255, -1)
+    #
+    # corners = cv2.goodFeaturesToTrack(grid,16,0.1,10)
+    # corners = np.int0(corners)
+    #
+    # for i in corners:
+    #     x,y = i.ravel()
+    #     cv2.circle(grid,(x,y),5,255,-1)
 
     ''' trovare intersezione per trovare angoli '''
     ''' ampliare immagine se angoli esterni '''
@@ -148,4 +166,8 @@ def main():
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    main()
+    import sys
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    else:
+        main()
