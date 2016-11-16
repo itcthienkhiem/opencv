@@ -13,61 +13,66 @@ def drawLines(lines, image, color=64):
         else:
             cv2.line(image,(int(line[0]),0),(int(line[0]),image.shape[0]),color,1)
 
-def mergeRelatedLines(lines, image):
-    for i1, line in enumerate(lines):
-        if(line[0]==0 and line[1]==-100):
-            continue
+def order_points(pts):
+	# initialzie a list of coordinates that will be ordered
+	# such that the first entry in the list is the top-left,
+	# the second entry is the top-right, the third is the
+	# bottom-right, and the fourth is the bottom-left
+	rect = np.zeros((4, 2), dtype = "float32")
 
-        p1 = line[0]
-        theta1 = line[1]
+	# the top-left point will have the smallest sum, whereas
+	# the bottom-right point will have the largest sum
+	s = pts.sum(axis = 1)
+	rect[0] = pts[np.argmin(s)]
+	rect[2] = pts[np.argmax(s)]
 
-        if (theta1 > np.pi*45/180 and theta1 < np.pi*135/180):
-            pt1current = [0, p1/math.sin(theta1)]
-            pt2current = [image.shape[1], -image.shape[1]/math.tan(theta1)+p1/math.sin(theta1)]
-        else:
-            try: #????????
-                pt1current = [p1/math.cos(theta1), 0]
-                pt2current = [-image.shape[0]/math.tan(theta1)+p1/math.cos(theta1), image.shape[0]]
-            except:
-                pass
+	# now, compute the difference between the points, the
+	# top-right point will have the smallest difference,
+	# whereas the bottom-left will have the largest difference
+	diff = np.diff(pts, axis = 1)
+	rect[1] = pts[np.argmin(diff)]
+	rect[3] = pts[np.argmax(diff)]
 
-        for i2, line2 in enumerate(lines):
-            if (i1 == i2):
-                continue
+	# return the ordered coordinates
+	return rect
 
-            if (abs(line2[0]-line[0])<20 and abs(line2[1]-line[1])<np.pi*10/180):
-                p = line2[0];
-                theta = line2[1]
-                try:
-                    if (theta > np.pi*45/180 and theta < np.pi*135/180):
-                        pt1 = [0, p/math.sin(theta)]
-                        pt2 = [image.shape[1], -image.shape[1]/math.tan(theta)+p/math.sin(theta)]
-                    else:
-                        pt1 = [p/math.cos(theta), 0]
-                        pt2 = [-image.shape[0]/math.tan(theta)+p/math.cos(theta), image.shape[0]]
+def four_point_transform(image, pts):
+	# obtain a consistent order of the points and unpack them
+	# individually
+	rect = order_points(pts)
+	(tl, tr, br, bl) = rect
 
-                    if  (pt1[0]-pt1current[0])**2 + (pt1[1]-pt1current[1])**2 < 200 and \
-                        (pt2[0]-pt2current[0])**2 + (pt2[1]-pt2current[1])**2 < 200 :
+	# compute the width of the new image, which will be the
+	# maximum distance between bottom-right and bottom-left
+	# x-coordiates or the top-right and top-left x-coordinates
+	widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+	widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+	maxWidth = max(int(widthA), int(widthB))
 
-                        lines[i1][0] = (line[0]+line2[0])/2
-                        lines[i1][1] = (line[1]+line2[1])/2
+	# compute the height of the new image, which will be the
+	# maximum distance between the top-right and bottom-right
+	# y-coordinates or the top-left and bottom-left y-coordinates
+	heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+	heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+	maxHeight = max(int(heightA), int(heightB))
 
-                        lines[i2][0] = 0
-                        lines[i2][1] = -100
-                except:
-                    pass
+	# now that we have the dimensions of the new image, construct
+	# the set of destination points to obtain a "birds eye view",
+	# (i.e. top-down view) of the image, again specifying points
+	# in the top-left, top-right, bottom-right, and bottom-left
+	# order
+	dst = np.array([
+		[0, 0],
+		[maxWidth - 1, 0],
+		[maxWidth - 1, maxHeight - 1],
+		[0, maxHeight - 1]], dtype = "float32")
 
-def mergeLines(lines, image):
-    for line in lines:
-        if (line[1]!=0):
-            m = -1/math.tan(line[1])
-            c = line[0]/math.sin(line[1])
-            # (0, c) (width, m*width+c)
-            # x,y con origine in alto a sinistra
+	# compute the perspective transform matrix and then apply it
+	M = cv2.getPerspectiveTransform(rect, dst)
+	warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 
-        else:
-            cv2.line(image,(int(line[0]),0),(int(line[0]),image.shape[0]),color,1)
-
+	# return the warped image
+	return warped
 
 def main(image_src='sudoku.jpg'):
     image = cv2.imread('../images/%s'%image_src, 0)
@@ -77,6 +82,7 @@ def main(image_src='sudoku.jpg'):
 
     kernel = np.array([[0,1,0],[1,1,1],[0,1,0]], dtype=np.uint8)
     dilate = cv2.dilate(thresh,kernel)
+    cpDilate = dilate.copy()
 
     height, width = dilate.shape[:2]
     mask = np.zeros((height+2, width+2), np.uint8)
@@ -134,8 +140,11 @@ def main(image_src='sudoku.jpg'):
     print(len(approx))
 
     cv2.drawContours(mask, cnt_max, -1, 255, 1)
+
+    vertex = list()
     for point in approx:
         point = point[0]
+        vertex.append(point)
         cv2.circle(mask, (point[0],point[1]),   8, 255, -1)
 
     # (x, y, w, h) = cv2.boundingRect(approx)
@@ -147,13 +156,13 @@ def main(image_src='sudoku.jpg'):
     # for i in corners:
     #     x,y = i.ravel()
     #     cv2.circle(mask,(x,y),5,255,-1)
-    #
-    rect = cv2.minAreaRect(cnt_max) # (centrox, centroy), (w,h), angolo
-    print(rect)
-    box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-    # print(box)
-    box = np.int0(box)
-    cv2.drawContours(mask,[box],0,64,2)
+
+    # rect = cv2.minAreaRect(cnt_max) # (centrox, centroy), (w,h), angolo
+    # print(rect)
+    # box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
+    # # print(box)
+    # box = np.int0(box)
+    # cv2.drawContours(mask,[box],0,64,2)
 
     # rect_w, rect_h = map(int, rect[1])
     # l = max(rect_w, rect_h)
@@ -180,16 +189,24 @@ def main(image_src='sudoku.jpg'):
     # edges = cv2.Canny(grid,50,150,apertureSize = 3)
     # cv2.imshow('edges', edges)
 
-    lines = cv2.HoughLines(grid,1,np.pi/180,200)
+    # lines = cv2.HoughLines(grid,1,np.pi/180,200)
 
     ''' migliorare funzione di merge '''
     # mergeRelatedLines(lines[0], image)
-    drawLines(lines[0], mask)
+    # drawLines(lines[0], mask)
 
     #cv2.circle(grid,(rect[0], rect[3]), 10, 255, -1)
     #cv2.circle(grid,(rect[2], rect[1]), 10, 255, -1)
 
-    # vedi fitLine !!!!!!!!!!!!!!!11
+    # vedi fitLine !!!!!!!!!!!!!!!
+
+
+    #if vertex[0][0] > width/2:
+        # il punto si trova sulla parte destra dell'immagine
+
+    pts = np.array(vertex, dtype = "float32")
+    dst = four_point_transform(thresh, pts) # thresh o cpDilate
+    cv2.imshow('dst',dst)
 
 
     ''' trovare intersezione per trovare angoli '''
@@ -211,7 +228,8 @@ def main(image_src='sudoku.jpg'):
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
-        main(sys.argv[1])
+        for img_path in sys.argv[1:]:
+            main(img_path)
     else:
         main()
 
