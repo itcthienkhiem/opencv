@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<!-- saved from url=(0094)http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square -->
+<html itemscope="" itemtype="http://schema.org/QAPage"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>python - How to remove convexity defects in a Sudoku square? - Stack Overflow</title>
+    <link rel="shortcut icon" href="http://cdn.sstatic.net/Sites/stackoverflow/img/favicon.ico?v=4f32ecc8f43d">
+    <link rel="apple-touch-icon image_src" href="http://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a">
+    <link rel="search" type="application/opensearchdescription+xml" title="Stack Overflow" href="http://stackoverflow.com/opensearch.xml">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:domain" content="stackoverflow.com">
+    <meta property="og:type" content="website">
+
+    <meta property="og:image" itemprop="image primaryImageOfPage" content="http://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon@2.png?v=73d79a89bded&amp;a">
+    <meta name="twitter:title" property="og:title" itemprop="title name" content="How to remove convexity defects in a Sudoku square?">
+    <meta name="twitter:description" property="og:description" itemprop="description" content="I was doing a fun project: Solving a Sudoku from an input image using OpenCV (as in Google goggles etc). And I have completed the task, but at the end I found a little problem for which I came here...">
+    <meta property="og:url" content="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square">
+    <link rel="canonical" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square">
+
+    
+    
+    <script type="text/javascript" async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/ados"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/quant.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/beacon.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/analytics.js"></script><script src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/jquery.min.js"></script>
+    <script src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/stub.en.js"></script>
+    <link rel="stylesheet" type="text/css" href="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/all.css">
+
+            <link rel="alternate" type="application/atom+xml" title="Feed for question &#39;How to remove convexity defects in a Sudoku square?&#39;" href="http://stackoverflow.com/feeds/question/10196198">
+            <meta name="twitter:app:country" content="US">
+            <meta name="twitter:app:name:iphone" content="Stack Exchange iOS">
+            <meta name="twitter:app:id:iphone" content="871299723">
+            <meta name="twitter:app:url:iphone" content="se-zaphod://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square">
+            <meta name="twitter:app:name:ipad" content="Stack Exchange iOS">
+            <meta name="twitter:app:id:ipad" content="871299723">
+            <meta name="twitter:app:url:ipad" content="se-zaphod://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square">
+            <meta name="twitter:app:name:googleplay" content="Stack Exchange Android">
+            <meta name="twitter:app:url:googleplay" content="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square">
+            <meta name="twitter:app:id:googleplay" content="com.stackexchange.marvin">
+        <script>
+        
+            StackExchange.ready(function () {
+                                    
+                    StackExchange.using("snippets", function () {
+                        StackExchange.snippets.initSnippetRenderer();
+                    });
+                    
+
+                StackExchange.using("postValidation", function () {
+                    StackExchange.postValidation.initOnBlurAndSubmit($('#post-form'), 2, 'answer');
+                });
+
+                
+                StackExchange.question.init({votesCast:[],autoShowCommentHelp:true,showAnswerHelp:true,totalCommentCount:4,shownCommentCount:4,highlightColor:'#F4A83D',backgroundColor:'#FFF',questionId:10196198});
+
+                styleCode();
+
+                    StackExchange.realtime.subscribeToQuestion('1', '10196198');
+                                                                    StackExchange.using("gps", function () { StackExchange.gps.trackOutboundClicks('#content', '.post-text'); });
+
+            });
+        </script>
+
+
+    <script>
+        StackExchange.init({"locale":"en","stackAuthUrl":"https://stackauth.com","networkMetaHostname":"meta.stackexchange.com","serverTime":1479414775,"routeName":"Questions/Show","site":{"name":"Stack Overflow","description":"Q&A for professional and enthusiast programmers","isNoticesTabEnabled":true,"recaptchaPublicKey":"6LdchgIAAAAAAJwGpIzRQSOFaO0pU6s44Xt8aTwc","recaptchaAudioLang":"en","enableNewTagCreationWarning":true,"insertSpaceAfterNameTabCompletion":false,"id":1,"enableInsertDocLinkDialog":true,"enableSocialMediaInSharePopup":true},"user":{"fkey":"5029baa4ec87cc03feb79fda4da94ffc","rep":1,"isRegistered":true,"userType":3,"userId":7111640,"accountId":9575312,"gravatar":"<div class=\"gravatar-wrapper-32\"><img src=\"https://www.gravatar.com/avatar/db7fe92fa9aa233ca11d4d91ca5cc05f?s=32&amp;d=identicon&amp;r=PG&amp;f=1\" alt=\"\" width=\"32\" height=\"32\"></div>","profileUrl":"http://stackoverflow.com/users/7111640/davide-lusuardi","canSeeDeletedPosts":false,"ab":{"be_nice_anons_edit":{"v":"b","g":1}}},"events":{"postType":{"question":1},"postEditionSection":{"title":1,"body":2,"tags":3}}}, {"site":{"allowImageUploads":true,"enableUserHovercards":true,"styleCode":true,"enableNewLinkInsertDialog":true,"enableImgurHttps":true},"tags":{},"accounts":{"currentPasswordRequiredForChangingStackIdPassword":true},"flags":{"allowRetractingFlags":true},"snippets":{"snippetsEnabled":true,"renderDomain":"stacksnippets.net"},"markdown":{"asteriskIntraWordEmphasis":true}});
+        StackExchange.using.setCacheBreakers({"js/prettify-full.en.js":"065aba4ba47c","js/moderator.en.js":"1c93659f5989","js/full-anon.en.js":"394eb8fd0848","js/full.en.js":"4b52dfc368bb","js/wmd.en.js":"a2d0b2687220","js/third-party/jquery.autocomplete.min.js":"e5f01e97f7c3","js/third-party/jquery.autocomplete.min.en.js":"","js/mobile.en.js":"20710353f000","js/help.en.js":"a56fdf9b9ff2","js/tageditor.en.js":"390d598d51b3","js/tageditornew.en.js":"b8b7c69ee68f","js/inline-tag-editing.en.js":"77dde44800e2","js/revisions.en.js":"47de10a8358f","js/review.en.js":"68c8e977223b","js/tagsuggestions.en.js":"d1ff9b84abe5","js/post-validation.en.js":"acce73bc05c6","js/explore-qlist.en.js":"e71f14781288","js/events.en.js":"1ef855e2292d","js/keyboard-shortcuts.en.js":"7c966850958c","js/external-editor.en.js":"235e80f649d7","js/external-editor.en.js":"235e80f649d7","js/snippet-javascript.en.js":"bb9cbf50086e","js/snippet-javascript-codemirror.en.js":"3e086950b5eb"});
+        StackExchange.using("gps", function() {
+             StackExchange.gps.init(true);
+        });
+    </script>
+    
+<script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/full.en.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/snippet-javascript.en.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/post-validation.en.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/prettify-full.en.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/external-editor.en.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/wmd.en.js"></script><style type="text/css"> .wmd-snippet-button span { background-position: 0 0; } .wmd-snippet-button:hover span { background-position: 0 -40px; }</style><link type="text/css" rel="stylesheet" href="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/jobs-multi.min.css"><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/ados.js"></script><script type="text/javascript" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/adFeedback.js"></script><link rel="stylesheet" href="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/adFeedback.css"></head>
+<body class="question-page new-topbar">
+    <noscript>&lt;div id="noscript-padding"&gt;&lt;/div&gt;</noscript>
+            <script>(function () { var old = $.fn.contents; $.fn.contents = function () { try { return old.apply(this, arguments); } catch (e) { return $([]); } } })()</script>
+        
+
+
+
+
+    <div id="notify-container"></div>
+    <div id="custom-header"></div>
+
+
+
+
+
+<div class="topbar">
+    <div class="topbar-wrapper">
+
+        <div class="js-topbar-dialog-corral">
+
+
+    <div class="topbar-dialog siteSwitcher-dialog dno">
+        <div class="header">
+            <h3><a href="http://stackoverflow.com/">current community</a>
+            </h3>
+        </div>
+        <div class="modal-content current-site-container">
+            <ul class="current-site">
+                    <li>
+                            <div class="related-links">
+                    <a href="http://chat.stackoverflow.com/" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:6 })">chat</a>
+                    <a href="http://stackoverflow.com/users/logout" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:8 })">log out</a>
+    </div>
+
+
+
+
+    <a href="http://stackoverflow.com/" class="current-site-link site-link js-gps-track" data-id="1" data-gps-track="
+        site_switcher.click({ item_type:3 })">
+        <div class="site-icon favicon favicon-stackoverflow" title="Stack Overflow"></div>
+        Stack Overflow
+    </a>
+
+                    </li>
+                    <li class="related-site">
+                            <div class="L-shaped-icon-container">
+        <span class="L-shaped-icon"></span>
+    </div>
+
+                        
+
+
+
+    <a href="http://meta.stackoverflow.com/" class="site-link js-gps-track" data-id="552" data-gps-track="
+            site.switch({ target_site:552, item_type:3 }),
+        site_switcher.click({ item_type:4 })">
+        <div class="site-icon favicon favicon-stackoverflowmeta" title="Meta Stack Overflow"></div>
+        Meta Stack Overflow
+    </a>
+
+                    </li>
+            </ul>
+        </div>
+
+        <div class="header" id="your-communities-header">
+            <h3>
+                    <a href="http://stackexchange.com/users/9575312/?tab=accounts">your communities</a>
+            </h3>
+
+                <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" id="edit-pinned-sites">edit</a>
+                <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" id="cancel-pinned-sites" style="display: none;">cancel</a>
+        </div>
+        <div class="modal-content" id="your-communities-section">
+
+                <ul class="my-sites">
+                        <li>
+                            
+
+
+
+    <a href="http://stackoverflow.com/" class="site-link js-gps-track" data-id="1" data-gps-track="
+            site.switch({ target_site:1, item_type:3 }),
+        site_switcher.click({ item_type:1 })">
+        <div class="site-icon favicon favicon-stackoverflow" title="Stack Overflow"></div>
+        Stack Overflow
+            <span class="rep-score">1</span>
+    </a>
+
+                        </li>
+                </ul>
+                    <div class="pinned-site-editor-container" style="display: none;">
+                        <input id="js-site-search-txt" type="text" class="site-filter-input" value="" placeholder="Add a Stack Exchange community">
+                        <input type="submit" id="pin-site-btn" value="Add" disabled="disabled">
+                        <ul class="js-found-sites found-sites"></ul>
+                        <ul class="pinned-site-list sortable" data-custom-list="False">
+                        </ul>
+                        <input type="submit" value="Save" id="save-pinned-sites-btn" disabled="disabled">
+                        <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" id="reset-pinned-sites">reset to default list</a>
+                    </div>
+        </div>
+
+        <div class="header">
+            <h3><a href="http://stackexchange.com/sites">more stack exchange communities</a>
+            </h3>
+            <a href="http://stackoverflow.blog/" class="fr">company blog</a>
+        </div>
+        <div class="modal-content">
+                <div class="child-content"></div>
+        </div>        
+    </div>
+        </div>
+
+        <div class="network-items">
+                <a href="http://stackexchange.com/" class="topbar-icon icon-site-switcher yes-hover js-site-switcher-button js-gps-track" data-gps-track="site_switcher.show" title="A list of all 162 Stack Exchange sites">
+                    <span class="hidden-text">Stack Exchange</span>
+                </a>
+
+    <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" class="topbar-icon icon-inbox yes-hover js-inbox-button" title="You have unread inbox messages">
+        <span class="hidden-text">Inbox</span>
+        <span class="unread-count" style="">1</span>
+    </a>
+    <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" class="topbar-icon icon-achievements yes-hover js-achievements-button" data-unread-class="" title="Recent achievements: reputation, badges, and privileges earned">
+        <span class="hidden-text">Reputation and Badges</span>
+        <span class="unread-count" style="display:none">
+            
+        </span>
+    </a>
+        </div>
+
+        <div class="topbar-links">
+
+                <a href="http://stackoverflow.com/users/7111640/davide-lusuardi" class="profile-me js-gps-track" data-gps-track="profile_summary.click()">
+                    
+                    <div class="gravatar-wrapper-24" title="Davide Lusuardi"><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/db7fe92fa9aa233ca11d4d91ca5cc05f" alt="" width="24" height="24" class="avatar-me js-avatar-me"></div>
+
+                    <div class="links-container topbar-flair">
+
+                        <span class="reputation" title="your reputation: 1">
+                            1
+                        </span>
+                    </div>
+                </a>
+                <div class="links-container">
+                    <span class="topbar-menu-links">
+
+
+
+
+        <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" class="icon-help js-help-button" title="Help Center and other resources">
+            help
+            <span class="triangle"></span>
+        </a>
+    <div class="topbar-dialog help-dialog js-help-dialog dno">
+        <div class="modal-content">
+            <ul>
+                                    <li>
+                        <a href="http://stackoverflow.com/tour" class="js-gps-track" data-gps-track="help_popup.click({ item_type:1 })">
+                            Tour
+                            <span class="item-summary">
+                                Start here for a quick overview of the site
+                            </span>
+                        </a>
+                    </li>
+                <li>
+                    <a href="http://stackoverflow.com/help" class="js-gps-track" data-gps-track="help_popup.click({ item_type:4 })">
+                        Help Center
+                        <span class="item-summary">
+                            Detailed answers to any questions you might have
+                        </span>
+                    </a>
+                </li>
+                        <li>
+                            <a href="http://meta.stackoverflow.com/" class="js-gps-track" data-gps-track="help_popup.click({ item_type:2 })">
+                                Meta
+                                <span class="item-summary">
+                                    Discuss the workings and policies of this site
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://stackoverflow.com/company/about" class="js-gps-track" data-gps-track="help_popup.click({ item_type:6 })">
+                                About Us
+                                <span class="item-summary">
+                                    Learn more about Stack Overflow the company
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://business.stackoverflow.com/?ref=topbar_help" class="js-gps-track" data-gps-track="help_popup.click({ item_type:7 })">
+                                Business
+                                <span class="item-summary">
+                                    Learn more about hiring developers or posting ads with us
+                                </span>
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+                                            </span>
+                </div>
+
+            <div class="search-container">
+                <form id="search" action="http://stackoverflow.com/search" method="get" autocomplete="off">
+                    <input name="q" type="text" placeholder="Search Q&amp;A" value="" tabindex="1" autocomplete="off" maxlength="240">
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+    <script>
+        StackExchange.ready(function() { StackExchange.topbar.init(); });
+    </script>
+
+    <div class="container">
+        <div id="header">
+            <br class="cbt">
+            <div id="hlogo">
+                <a href="http://stackoverflow.com/">
+                    Stack Overflow
+                </a>
+            </div>
+            <div id="hmenus">
+                <div class="nav mainnavs">
+                    <ul>
+                            <li class="youarehere">
+        <a id="nav-questions" href="http://stackoverflow.com/questions" class="js-gps-track" data-gps-track="top_nav.click({is_current:true, location:3, destination:1})">
+        Questions
+        </a>
+    </li>
+
+    <li>
+        <a id="nav-jobs" href="http://stackoverflow.com/jobs?med=site-ui&amp;ref=jobs-tab" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:6})">
+        Jobs
+        </a>
+    </li>
+                            <li>
+        <a id="nav-docs" href="http://stackoverflow.com/documentation" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:7})">
+        Documentation
+        </a>
+    </li>
+                            <li>
+        <a id="nav-tags" href="http://stackoverflow.com/tags" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:2})">
+        Tags
+        </a>
+    </li>
+
+                            <li>
+        <a id="nav-users" href="http://stackoverflow.com/users" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:3})">
+        Users
+        </a>
+    </li>
+
+                            <li>
+        <a id="nav-badges" href="http://stackoverflow.com/help/badges" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:4})">
+        Badges
+        </a>
+    </li>
+
+                    </ul>
+                </div>
+                <div class="nav askquestion">
+                    <ul>
+                        <li>
+                            <a id="nav-askquestion" href="http://stackoverflow.com/questions/ask">Ask Question</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+
+
+
+        <div id="content" class="snippet-hidden">
+            
+
+<div itemscope="" itemtype="http://schema.org/Question">
+    <link itemprop="image" href="http://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a">
+			<div id="question-header">
+                <h1 itemprop="name"><a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square" class="question-hyperlink">How to remove convexity defects in a Sudoku square?</a></h1>
+		</div>
+			<div id="mainbar">
+
+			
+
+<div class="question" data-questionid="10196198" id="question">
+
+    <div class="everyonelovesstackoverflow adzerk-vote" id="clc-tlb"><a href="http://engine.adzerk.net/r?e=eyJhdiI6OTE0OTQsImF0Ijo0LCJidCI6MCwiY20iOjQ5NzE0MiwiY2giOjExNzgsImNrIjp7fSwiY3IiOjE3NTYyODgsImRpIjoiYTBmMTMzMGRlMGYyNGQ4MWFjNzdhZWY0NGI0MzAzZDciLCJkbSI6MSwiZmMiOjIwODQ2MTUsImZsIjoyNTY3NjU1LCJpcCI6Ijg4LjE0Ny45OC4yNSIsImt3IjoicHl0aG9uLG9wZW5jdixjb21wdXRlci12aXNpb24sc3Vkb2t1IiwibWsiOiJweXRob24iLCJudyI6MjIsInBjIjoxMC40NSwiZWMiOjEwLjQ1LCJwciI6NzY1LCJydCI6MiwicmYiOiJodHRwOi8vc3RhY2tvdmVyZmxvdy5jb20vcXVlc3Rpb25zLzQwNDA5MTUzL29wZW5jdi1kZXRlY3QtcmVjdGFuZ2xlIiwic3QiOjgyNzcsInVrIjoidWUxLTA4OThhNWIzOTAyMzRmMWFhZDlmMmI4NGM4YTQzZDM3Iiwiem4iOjQzLCJ0cyI6MTQ3OTQxNDc3ODUxNCwiYmYiOnRydWUsInBuIjoiY2xjLXRsYiIsInVyIjoiaHR0cHM6Ly9yZWRpc2xhYnMuY29tL2xwLWdhdy1zZXJ2aWNlP3V0bV9zb3VyY2U9U3RhY2tPdmVyZmxvdyUyMENsb3VkJnV0bV9tZWRpdW09YmFubmVyJnV0bV9jYW1wYWlnbj1SZWRpcyUyMENsb3VkJnV0bV90ZXJtPVNpZ24lMjBVcCUyMGZvciUyMFJlZGlzJTIwQ2xvdWQifQ&amp;s=92mc1TXvolyqLru9HTjUoFkmm14" rel="nofollow" target="_blank" title=""><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/478028b345e240ba8573027b6981f6b3.png" title="" alt="" border="0" width="728" height="90"></a><div class="adzerk-vote-controls" style="display: none;"><div class="adzerk-vote-option adzerk-vote-up"><div class="adzerk-vote-icon"></div></div><div class="adzerk-vote-option adzerk-vote-down"><div class="adzerk-vote-icon"></div></div></div><div class="adzerk-vote-survey" style="display:none;"><form><span>No problem. We won't show you that ad again. Why didn't you like it?</span><ul><li><label><input type="radio" value="12" name="downvoteReason">Uninteresting</label></li><li><label><input type="radio" value="13" name="downvoteReason">Misleading</label></li><li><label><input type="radio" value="14" name="downvoteReason">Offensive</label></li><li><label><input type="radio" value="15" name="downvoteReason">Repetitive</label></li><li><label><input type="radio" value="16" name="downvoteReason">Other</label></li></ul><a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" class="adzerk-vote-cancel">Oops! I didn't mean to do this.</a></form></div><img height="0px" width="0px" border="0" style="position:absolute;" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/i.gif"></div>    <table>
+        <tbody><tr>
+            <td class="votecell">
+                
+
+<div class="vote">
+        <input type="hidden" name="_id_" value="10196198">
+        <a class="vote-up-off" title="This question shows research effort; it is useful and clear">up vote</a>
+        <span itemprop="upvoteCount" class="vote-count-post ">127</span>
+        <a class="vote-down-off" title="This question does not show any research effort; it is unclear or not useful">down vote</a>
+
+        <a class="star-off" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" title="Click to mark as favorite question (click again to undo)">favorite</a>
+        <div class="favoritecount"><b>108</b></div>
+
+
+</div>
+
+            </td>
+            
+<td class="postcell">
+<div>
+    <div class="post-text" itemprop="text">
+
+<p>I was doing a fun project: Solving a Sudoku from an input image using OpenCV (as in Google goggles etc). And I have completed the task, but at the end I found a little problem for which I came here.</p>
+
+<p>I did the programming using Python API of OpenCV 2.3.1.</p>
+
+<p>Below is what I did :</p>
+
+<ol>
+<li>Read the image</li>
+<li>Find the contours </li>
+<li>Select the one with maximum area, ( and also somewhat equivalent to square).</li>
+<li><p>Find the corner points.</p>
+
+<p>e.g. given below:</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/h1yKg.png" alt="enter image description here"></p>
+
+<p>(<strong>Notice here that the green line correctly coincides with the true boundary of the Sudoku, so the Sudoku can be correctly warped</strong>. Check next image)</p></li>
+<li><p>warp the image to a perfect square</p>
+
+<p>eg image:</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/i4D9o.png" alt="enter image description here"></p></li>
+<li><p>Perform OCR ( for which I used the method I have given in <a href="http://stackoverflow.com/questions/9413216/simple-digit-recognition-ocr-in-opencv-python">Simple Digit Recognition OCR in OpenCV-Python</a> )</p></li>
+</ol>
+
+<p>And the method worked well.</p>
+
+<p><strong>Problem:</strong></p>
+
+<p>Check out <a href="http://web.archive.org/web/20140601100441/http://davemark.com/images/sudoku.jpg" rel="nofollow noreferrer">this image.</a></p>
+
+<p>Performing the step 4 on this image gives the result below:</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/YTiOC.jpg" alt="enter image description here"></p>
+
+<p>The red line drawn is the original contour which is the true outline of sudoku boundary.</p>
+
+<p>The green line drawn is approximated contour which will be the outline of warped image.</p>
+
+<p>Which of course, there is difference between green line and red line at the top edge of sudoku. So while warping, I am not getting the original boundary of the Sudoku.</p>
+
+<p><strong>My Question :</strong> </p>
+
+<p>How can I warp the image on the correct boundary of the Sudoku, i.e. the red line OR how can I remove the difference between red line and green line? Is there any method for this in OpenCV?</p>
+    </div>
+    <div class="post-taglist">
+        <a href="http://stackoverflow.com/questions/tagged/python" class="post-tag js-gps-track" title="show questions tagged &#39;python&#39;" rel="tag">python</a> <a href="http://stackoverflow.com/questions/tagged/opencv" class="post-tag js-gps-track" title="show questions tagged &#39;opencv&#39;" rel="tag">opencv</a> <a href="http://stackoverflow.com/questions/tagged/computer-vision" class="post-tag js-gps-track" title="show questions tagged &#39;computer-vision&#39;" rel="tag">computer-vision</a> <a href="http://stackoverflow.com/questions/tagged/sudoku" class="post-tag js-gps-track" title="show questions tagged &#39;sudoku&#39;" rel="tag">sudoku</a> 
+    </div>
+    <table class="fw">
+    <tbody><tr>
+    <td class="vt">
+<div class="post-menu"><a href="http://stackoverflow.com/q/10196198/7111640" title="short permalink to this question" class="short-link" id="link-post-10196198">share</a><span class="lsep">|</span><a href="http://stackoverflow.com/posts/10196198/edit" class="suggest-edit-post" title="revise and improve this post">edit</a></div>        
+    </td>
+    <td align="right" class="post-signature">
+<div class="user-info ">
+    <div class="user-action-time">
+        <a href="http://stackoverflow.com/posts/10196198/revisions" title="show all edits to this post">edited <span title="2016-05-15 16:39:33Z" class="relativetime">May 15 at 16:39</span></a>
+    </div>
+    <div class="user-gravatar32">
+        <a href="http://stackoverflow.com/users/4828720/bugmenot123"><div class="gravatar-wrapper-32"><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/8811b9e0226afce9b0292eeff4d0fd49" alt="" width="32" height="32"></div></a>
+    </div>
+    <div class="user-details">
+        <a href="http://stackoverflow.com/users/4828720/bugmenot123">bugmenot123</a>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score " dir="ltr">404</span><span title="3 silver badges"><span class="badge2"></span><span class="badgecount">3</span></span><span title="15 bronze badges"><span class="badge3"></span><span class="badgecount">15</span></span>
+        </div>
+    </div>
+</div>    </td>
+    <td class="post-signature owner">
+        <div class="user-info user-hover">
+    <div class="user-action-time">
+        asked <span title="2012-04-17 17:39:18Z" class="relativetime">Apr 17 '12 at 17:39</span>
+    </div>
+    <div class="user-gravatar32">
+        <a href="http://stackoverflow.com/users/1134940/abid-rahman-k"><div class="gravatar-wrapper-32"><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/a96e438acc27c0e4961ec84a019e78c6" alt="" width="32" height="32"></div></a>
+    </div>
+    <div class="user-details">
+        <a href="http://stackoverflow.com/users/1134940/abid-rahman-k">Abid Rahman K</a>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score 27,293" dir="ltr">27.3k</span><span title="15 gold badges"><span class="badge1"></span><span class="badgecount">15</span></span><span title="89 silver badges"><span class="badge2"></span><span class="badgecount">89</span></span><span title="120 bronze badges"><span class="badge3"></span><span class="badgecount">120</span></span>
+        </div>
+    </div>
+</div>
+    </td>
+    </tr>
+    </tbody></table>
+</div>
+</td>
+        </tr>
+                
+<tr>
+    <td class="votecell"></td>
+    <td>
+	    <div id="comments-10196198" class="comments ">
+		    <table>
+                <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true">
+
+
+
+    <tr id="comment-13090587" class="comment ">
+        <td>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                &nbsp;&nbsp;
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">You're doing your detection based on corner points, which the red and green lines agree on. I don't know OpenCV, but presumably you'll want to detect the lines between those corner points and warp based on that.</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/344821/dougal" title="19,360 reputation" class="comment-user">Dougal</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13090587_10196198"><span title="2012-04-17 17:43:07Z" class="relativetime-clean">Apr 17 '12 at 17:43</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-13090647" class="comment ">
+        <td>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                &nbsp;&nbsp;
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Perhaps force the lines that connect the corner points to coincide with heavy black pixels in the image. That is, instead of letting the green lines just find a straight line between corner points, force them to traverse heavy black pixels. This will make your problem substantially more difficult, I think, and I don't know of any OpenCV built-ins that will be immediately useful for you.</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/567620/mr-f" title="19,835 reputation" class="comment-user">Mr. F</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13090647_10196198"><span title="2012-04-17 17:45:20Z" class="relativetime-clean">Apr 17 '12 at 17:45</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-13090689" class="comment ">
+        <td>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                &nbsp;&nbsp;
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">@ Dougal :  I think the green line drawn is the approximated straight line of red line. so it is the line between those corner points. When i warp according to green line, i get curved red line at the top of warped image. ( i hope you understand, my explanation seems a little bad)</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/1134940/abid-rahman-k" title="27,293 reputation" class="comment-user owner">Abid Rahman K</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13090689_10196198"><span title="2012-04-17 17:46:56Z" class="relativetime-clean">Apr 17 '12 at 17:46</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-13090822" class="comment ">
+        <td>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                &nbsp;&nbsp;
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">@ EMS : i think red line drawn is exactly on the border of sudoku. But problem is, how to warp the image exactly on the border of sudoku. ( i mean, problem is with warping, ie converting those curved border to an exact square, as i have shown in second image)</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/1134940/abid-rahman-k" title="27,293 reputation" class="comment-user owner">Abid Rahman K</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13090822_10196198"><span title="2012-04-17 17:52:07Z" class="relativetime-clean">Apr 17 '12 at 17:52</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+                </tbody>
+		    </table>
+	    </div>
+
+        <div id="comments-link-10196198" data-rep="50" data-reg="true">
+
+                <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments.">add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" onclick=""></a>
+        </div>         
+    </td>
+</tr>        </tbody></table>
+</div>
+
+			<div id="answers">
+
+				<a name="tab-top"></a>
+				<div id="answers-header">
+					<div class="subheader answers-subheader">
+						<h2>
+								3 Answers
+                                <span style="display:none;" itemprop="answerCount">3</span>
+						</h2>
+						<div>
+							<div id="tabs">
+        <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square?answertab=active#tab-top" data-nav-xhref="" title="Answers with the latest activity first" data-value="active" data-shortcut="A">
+            active</a>
+        <a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square?answertab=oldest#tab-top" data-nav-xhref="" title="Answers in the order they were provided" data-value="oldest" data-shortcut="O">
+            oldest</a>
+        <a class="youarehere" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square?answertab=votes#tab-top" data-nav-xhref="" title="Answers with the highest score first" data-value="votes" data-shortcut="V">
+            votes</a>
+</div>
+						</div>
+					</div>    
+				</div>    
+
+
+
+
+  
+<a name="10226971"></a>
+<div id="answer-10226971" class="answer accepted-answer" data-answerid="10226971" itemscope="" itemtype="http://schema.org/Answer" itemprop="acceptedAnswer">
+    <table>
+        <tbody><tr>
+            <td class="votecell">
+                
+
+<div class="vote">
+        <input type="hidden" name="_id_" value="10226971">
+        <a class="vote-up-off" title="This answer is useful">up vote</a>
+        <span itemprop="upvoteCount" class="vote-count-post ">176</span>
+        <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+        <span class="vote-accepted-on load-accepted-answer-date" title="loading when this answer was accepted...">accepted</span>
+
+</div>
+
+            </td>
+            
+
+
+<td class="answercell">
+    <div class="post-text" itemprop="text">
+<p>I have a solution that works, but you'll have to translate it to OpenCV yourself. It's written in Mathematica.</p>
+
+<p>The first step is to adjust the brightness in the image, by dividing each pixel with the result of a closing operation:</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">src </span><span class="pun">=</span><span class="pln"> </span><span class="typ">ColorConvert</span><span class="pun">[</span><span class="typ">Import</span><span class="pun">[</span><span class="str">"http://davemark.com/images/sudoku.jpg"</span><span class="pun">],</span><span class="pln"> </span><span class="str">"Grayscale"</span><span class="pun">];</span><span class="pln">
+white </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Closing</span><span class="pun">[</span><span class="pln">src</span><span class="pun">,</span><span class="pln"> </span><span class="typ">DiskMatrix</span><span class="pun">[</span><span class="lit">5</span><span class="pun">]];</span><span class="pln">
+srcAdjusted </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Image</span><span class="pun">[</span><span class="typ">ImageData</span><span class="pun">[</span><span class="pln">src</span><span class="pun">]/</span><span class="typ">ImageData</span><span class="pun">[</span><span class="pln">white</span><span class="pun">]]</span></code></pre>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/DLMIA.png" alt="enter image description here"></p>
+
+<p>The next step is to find the sudoku area, so I can ignore (mask out) the background. For that, I use connected component analysis, and select the component that's got the largest convex area:</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">components </span><span class="pun">=</span><span class="pln"> 
+  </span><span class="typ">ComponentMeasurements</span><span class="pun">[</span><span class="pln">
+    </span><span class="typ">ColorNegate@Binarize</span><span class="pun">[</span><span class="pln">srcAdjusted</span><span class="pun">],</span><span class="pln"> </span><span class="pun">{</span><span class="str">"ConvexArea"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Mask"</span><span class="pun">}][[</span><span class="typ">All</span><span class="pun">,</span><span class="pln"> 
+    </span><span class="lit">2</span><span class="pun">]];</span><span class="pln">
+largestComponent </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Image</span><span class="pun">[</span><span class="typ">SortBy</span><span class="pun">[</span><span class="pln">components</span><span class="pun">,</span><span class="pln"> </span><span class="typ">First</span><span class="pun">][[-</span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="lit">2</span><span class="pun">]]]</span></code></pre>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/lGUIe.png" alt="enter image description here"></p>
+
+<p>By filling this image, I get a mask for the sudoku grid:</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">mask </span><span class="pun">=</span><span class="pln"> </span><span class="typ">FillingTransform</span><span class="pun">[</span><span class="pln">largestComponent</span><span class="pun">]</span></code></pre>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/jXwoT.png" alt="enter image description here"></p>
+
+<p>Now, I can use a 2nd order derivative filter to find the vertical and horizontal lines in two separate images:</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">lY </span><span class="pun">=</span><span class="pln"> </span><span class="typ">ImageMultiply</span><span class="pun">[</span><span class="typ">MorphologicalBinarize</span><span class="pun">[</span><span class="typ">GaussianFilter</span><span class="pun">[</span><span class="pln">srcAdjusted</span><span class="pun">,</span><span class="pln"> </span><span class="lit">3</span><span class="pun">,</span><span class="pln"> </span><span class="pun">{</span><span class="lit">2</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">}],</span><span class="pln"> </span><span class="pun">{</span><span class="lit">0.02</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0.05</span><span class="pun">}],</span><span class="pln"> mask</span><span class="pun">];</span><span class="pln">
+lX </span><span class="pun">=</span><span class="pln"> </span><span class="typ">ImageMultiply</span><span class="pun">[</span><span class="typ">MorphologicalBinarize</span><span class="pun">[</span><span class="typ">GaussianFilter</span><span class="pun">[</span><span class="pln">srcAdjusted</span><span class="pun">,</span><span class="pln"> </span><span class="lit">3</span><span class="pun">,</span><span class="pln"> </span><span class="pun">{</span><span class="lit">0</span><span class="pun">,</span><span class="pln"> </span><span class="lit">2</span><span class="pun">}],</span><span class="pln"> </span><span class="pun">{</span><span class="lit">0.02</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0.05</span><span class="pun">}],</span><span class="pln"> mask</span><span class="pun">];</span></code></pre>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/ptwTi.png" alt="enter image description here"></p>
+
+<p>I use connected component analysis again to extract the grid lines from these images. The grid lines are much longer than the digits, so I can use caliper length to select only the grid lines-connected components. Sorting them by position, I get 2x10 mask images for each of the vertical/horizontal grid lines in the image:</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">verticalGridLineMasks </span><span class="pun">=</span><span class="pln"> 
+  </span><span class="typ">SortBy</span><span class="pun">[</span><span class="typ">ComponentMeasurements</span><span class="pun">[</span><span class="pln">
+      lX</span><span class="pun">,</span><span class="pln"> </span><span class="pun">{</span><span class="str">"CaliperLength"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Centroid"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Mask"</span><span class="pun">},</span><span class="pln"> </span><span class="com"># &gt; 100 &amp;][[All, </span><span class="pln">
+      </span><span class="lit">2</span><span class="pun">]],</span><span class="pln"> </span><span class="com">#[[2, 1]] &amp;][[All, 3]];</span><span class="pln">
+horizontalGridLineMasks </span><span class="pun">=</span><span class="pln"> 
+  </span><span class="typ">SortBy</span><span class="pun">[</span><span class="typ">ComponentMeasurements</span><span class="pun">[</span><span class="pln">
+      lY</span><span class="pun">,</span><span class="pln"> </span><span class="pun">{</span><span class="str">"CaliperLength"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Centroid"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Mask"</span><span class="pun">},</span><span class="pln"> </span><span class="com"># &gt; 100 &amp;][[All, </span><span class="pln">
+      </span><span class="lit">2</span><span class="pun">]],</span><span class="pln"> </span><span class="com">#[[2, 2]] &amp;][[All, 3]];</span></code></pre>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/WKhhF.png" alt="enter image description here"></p>
+
+<p>Next I take each pair of vertical/horizontal grid lines, dilate them, calculate the pixel-by-pixel intersection, and calculate the center of the result. These points are the grid line intersections:</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">centerOfGravity</span><span class="pun">[</span><span class="pln">l_</span><span class="pun">]</span><span class="pln"> </span><span class="pun">:=</span><span class="pln"> 
+ </span><span class="typ">ComponentMeasurements</span><span class="pun">[</span><span class="typ">Image</span><span class="pun">[</span><span class="pln">l</span><span class="pun">],</span><span class="pln"> </span><span class="str">"Centroid"</span><span class="pun">][[</span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="lit">2</span><span class="pun">]]</span><span class="pln">
+gridCenters </span><span class="pun">=</span><span class="pln"> 
+  </span><span class="typ">Table</span><span class="pun">[</span><span class="pln">centerOfGravity</span><span class="pun">[</span><span class="pln">
+    </span><span class="typ">ImageData</span><span class="pun">[</span><span class="typ">Dilation</span><span class="pun">[</span><span class="typ">Image</span><span class="pun">[</span><span class="pln">h</span><span class="pun">],</span><span class="pln"> </span><span class="typ">DiskMatrix</span><span class="pun">[</span><span class="lit">2</span><span class="pun">]]]*</span><span class="pln">
+     </span><span class="typ">ImageData</span><span class="pun">[</span><span class="typ">Dilation</span><span class="pun">[</span><span class="typ">Image</span><span class="pun">[</span><span class="pln">v</span><span class="pun">],</span><span class="pln"> </span><span class="typ">DiskMatrix</span><span class="pun">[</span><span class="lit">2</span><span class="pun">]]]],</span><span class="pln"> </span><span class="pun">{</span><span class="pln">h</span><span class="pun">,</span><span class="pln"> 
+    horizontalGridLineMasks</span><span class="pun">},</span><span class="pln"> </span><span class="pun">{</span><span class="pln">v</span><span class="pun">,</span><span class="pln"> verticalGridLineMasks</span><span class="pun">}];</span></code></pre>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/26GOU.png" alt="enter image description here"></p>
+
+<p>The last step is to define two interpolation functions for X/Y mapping through these points, and transform the image using these functions:</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">fnX </span><span class="pun">=</span><span class="pln"> </span><span class="typ">ListInterpolation</span><span class="pun">[</span><span class="pln">gridCenters</span><span class="pun">[[</span><span class="typ">All</span><span class="pun">,</span><span class="pln"> </span><span class="typ">All</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1</span><span class="pun">]]];</span><span class="pln">
+fnY </span><span class="pun">=</span><span class="pln"> </span><span class="typ">ListInterpolation</span><span class="pun">[</span><span class="pln">gridCenters</span><span class="pun">[[</span><span class="typ">All</span><span class="pun">,</span><span class="pln"> </span><span class="typ">All</span><span class="pun">,</span><span class="pln"> </span><span class="lit">2</span><span class="pun">]]];</span><span class="pln">
+transformed </span><span class="pun">=</span><span class="pln"> 
+ </span><span class="typ">ImageTransformation</span><span class="pun">[</span><span class="pln">
+  srcAdjusted</span><span class="pun">,</span><span class="pln"> </span><span class="pun">{</span><span class="pln">fnX </span><span class="pun">@@</span><span class="pln"> </span><span class="typ">Reverse</span><span class="pun">[#],</span><span class="pln"> fnY </span><span class="pun">@@</span><span class="pln"> </span><span class="typ">Reverse</span><span class="pun">[#]}</span><span class="pln"> </span><span class="pun">&amp;,</span><span class="pln"> </span><span class="pun">{</span><span class="lit">9</span><span class="pun">*</span><span class="lit">50</span><span class="pun">,</span><span class="pln"> </span><span class="lit">9</span><span class="pun">*</span><span class="lit">50</span><span class="pun">},</span><span class="pln">
+   </span><span class="typ">PlotRange</span><span class="pln"> </span><span class="pun">-&gt;</span><span class="pln"> </span><span class="pun">{{</span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="lit">10</span><span class="pun">},</span><span class="pln"> </span><span class="pun">{</span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="lit">10</span><span class="pun">}},</span><span class="pln"> </span><span class="typ">DataRange</span><span class="pln"> </span><span class="pun">-&gt;</span><span class="pln"> </span><span class="typ">Full</span><span class="pun">]</span></code></pre>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/cLncR.png" alt="enter image description here"></p>
+
+<p>All of the operations are basic image processing function, so this should be possible in OpenCV, too. The spline-based image transformation might be harder, but I don't think you really need it. Probably using the perspective transformation you use now on each individual cell will give good enough results.</p>
+    </div>
+    <table class="fw">
+    <tbody><tr>
+    <td class="vt">
+<div class="post-menu"><a href="http://stackoverflow.com/a/10226971/7111640" title="short permalink to this answer" class="short-link" id="link-post-10226971">share</a><span class="lsep">|</span><a href="http://stackoverflow.com/posts/10226971/edit" class="suggest-edit-post" title="revise and improve this post">edit</a></div>                    </td>
+    <td align="right" class="post-signature">
+<div class="user-info ">
+    <div class="user-action-time">
+        <a href="http://stackoverflow.com/posts/10226971/revisions" title="show all edits to this post">edited <span title="2012-04-20 07:21:37Z" class="relativetime">Apr 20 '12 at 7:21</span></a>
+    </div>
+    <div class="user-gravatar32">
+        
+    </div>
+    <div class="user-details">
+        
+        <div class="-flair">
+            
+        </div>
+    </div>
+</div>    </td>
+            
+
+
+    <td align="right" class="post-signature">   
+       
+
+    <div class="user-info user-hover">
+    <div class="user-action-time">
+        answered <span title="2012-04-19 11:22:54Z" class="relativetime">Apr 19 '12 at 11:22</span>
+    </div>
+    <div class="user-gravatar32">
+        <a href="http://stackoverflow.com/users/143605/nikie"><div class="gravatar-wrapper-32"><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/df58f561d077412d586d254c2fcddf7c" alt="" width="32" height="32"></div></a>
+    </div>
+    <div class="user-details">
+        <a href="http://stackoverflow.com/users/143605/nikie">nikie</a>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score 10,032" dir="ltr">10k</span><span title="4 gold badges"><span class="badge1"></span><span class="badgecount">4</span></span><span title="27 silver badges"><span class="badge2"></span><span class="badgecount">27</span></span><span title="55 bronze badges"><span class="badge3"></span><span class="badgecount">55</span></span>
+        </div>
+    </div>
+</div>
+    </td>
+    </tr>
+    </tbody></table>
+</td>
+        </tr>
+        
+<tr>
+    <td class="votecell"></td>
+    <td>
+	    <div id="comments-10226971" class="comments ">
+		    <table>
+                <tbody data-remaining-comments-count="12" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true">
+
+
+
+    <tr id="comment-13141691" class="comment ">
+        <td class="comment-actions">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received" class="cool">2</span>
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Quite nice pipeline +1</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/813036/matthias-odisio" title="1,785 reputation" class="comment-user">Matthias Odisio</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13141691_10226971"><span title="2012-04-19 13:19:59Z" class="relativetime-clean">Apr 19 '12 at 13:19</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-13143442" class="comment ">
+        <td class="comment-actions">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received" class="cool">4</span>
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Wow. Can I give this a +10?? :) Nice job.</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/751484/jonathan-m" title="12,124 reputation" class="comment-user">Jonathan M</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13143442_10226971"><span title="2012-04-19 14:18:08Z" class="relativetime-clean">Apr 19 '12 at 14:18</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-13144044" class="comment ">
+        <td class="comment-actions">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received" class="cool">1</span>
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Wow, what a fantastic piece of Mathematica code.</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/692970/eli-lansey" title="796 reputation" class="comment-user">Eli Lansey</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13144044_10226971"><span title="2012-04-19 14:36:12Z" class="relativetime-clean">Apr 19 '12 at 14:36</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-13146932" class="comment ">
+        <td class="comment-actions">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received" class="cool">3</span>
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Oh my god !!!!!!!!! That was marvelous. This is really really great.  I will try to make it in OpenCV. Hope you would help me with details on certain functions and terminology... Thank you.</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/1134940/abid-rahman-k" title="27,293 reputation" class="comment-user owner">Abid Rahman K</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment13146932_10226971"><span title="2012-04-19 16:13:15Z" class="relativetime-clean">Apr 19 '12 at 16:13</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-22090131" class="comment ">
+        <td class="comment-actions">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received" class="cool">2</span>
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Amazing answer!  Where did you get the idea of dividing by the closing to normalize the image brightness?  I'm trying to improve the speed of this method, since floating-point division is painfully slow on mobile phones.  Do you have any suggestions? @AbidRahmanK</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/1397061/1" title="9,458 reputation" class="comment-user">1''</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment22090131_10226971"><span title="2013-03-22 23:19:52Z" class="relativetime-clean">Mar 22 '13 at 23:19</span></a></span>
+                        <span class="edited-yes" title="this comment was edited 1 time"></span>
+                                                                            </div>
+                    </td>
+    </tr>
+                </tbody>
+		    </table>
+	    </div>
+
+        <div id="comments-link-10226971" data-rep="50" data-reg="true">
+
+                <a class="js-add-link comments-link  dno" title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."></a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link " title="expand to show all comments on this post" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" onclick="">show <b>12</b> more comments</a>
+        </div>         
+    </td>
+</tr>    </tbody></table>
+</div>
+<div class="everyonelovesstackoverflow adzerk-vote" id="clc-mlb"><a href="http://engine.adzerk.net/r?e=eyJhdiI6NDIxMCwiYXQiOjQsImJ0IjowLCJjbSI6NDUxMDM4LCJjaCI6MTE3OCwiY2siOnt9LCJjciI6MTc0NDQ5OSwiZGkiOiI3MjYxMjM3ZDZiODM0NzFjYjc1ZjIwMTk4ODU2MjYzYyIsImRtIjoxLCJmYyI6MjA3MDI5NiwiZmwiOjE5NTg1ODQsImlwIjoiODguMTQ3Ljk4LjI1Iiwia3ciOiJweXRob24sb3BlbmN2LGNvbXB1dGVyLXZpc2lvbixzdWRva3UiLCJtayI6ImNvbXB1dGVyLXZpc2lvbiIsIm53IjoyMiwicGMiOjQuMiwiZWMiOjQuMiwicHIiOjc2NSwicnQiOjIsInJmIjoiaHR0cDovL3N0YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy80MDQwOTE1My9vcGVuY3YtZGV0ZWN0LXJlY3RhbmdsZSIsInN0Ijo4Mjc3LCJ1ayI6InVlMS0wODk4YTViMzkwMjM0ZjFhYWQ5ZjJiODRjOGE0M2QzNyIsInpuIjo0NCwidHMiOjE0Nzk0MTQ3Nzg1MTYsImJmIjp0cnVlLCJwbiI6ImNsYy1tbGIiLCJ1ciI6Imh0dHBzOi8vc29mdHdhcmUuaW50ZWwuY29tL2VuLXVzL21hY2hpbmUtbGVhcm5pbmc_Y2lkPSZ1dG1fY29udGVudD1NYWNoaW5lX0xlYXJuaW5nX0VudGh1c2lhc3RzJnV0bV9tZWRpdW09QmFubmVyX0FkJnV0bV9zb3VyY2U9U3RhY2tPdmVyZmxvdyZ1dG1fY2FtcGFpZ249TWFjaGluZV9MZWFybmluZ19RNF8xNl9TdGFja092ZXJmbG93In0&amp;s=a4kNbbYu-6-OakqKZt8qlx6IQxI" rel="nofollow" target="_blank" title=""><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/4289d7ac25084016b6caf0be1144f4e9.png" title="" alt="" border="0" width="728" height="90"></a><div class="adzerk-vote-controls" style="display: none;"><div class="adzerk-vote-option adzerk-vote-up"><div class="adzerk-vote-icon"></div></div><div class="adzerk-vote-option adzerk-vote-down"><div class="adzerk-vote-icon"></div></div></div><div class="adzerk-vote-survey" style="display:none;"><form><span>No problem. We won't show you that ad again. Why didn't you like it?</span><ul><li><label><input type="radio" value="12" name="downvoteReason">Uninteresting</label></li><li><label><input type="radio" value="13" name="downvoteReason">Misleading</label></li><li><label><input type="radio" value="14" name="downvoteReason">Offensive</label></li><li><label><input type="radio" value="15" name="downvoteReason">Repetitive</label></li><li><label><input type="radio" value="16" name="downvoteReason">Other</label></li></ul><a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" class="adzerk-vote-cancel">Oops! I didn't mean to do this.</a></form></div><img height="0px" width="0px" border="0" style="position:absolute;" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/i(1).gif"></div>
+  
+<a name="11366549"></a>
+<div id="answer-11366549" class="answer" data-answerid="11366549" itemscope="" itemtype="http://schema.org/Answer">
+    <table>
+        <tbody><tr>
+            <td class="votecell">
+                
+
+<div class="vote">
+        <input type="hidden" name="_id_" value="11366549">
+        <a class="vote-up-off" title="This answer is useful">up vote</a>
+        <span itemprop="upvoteCount" class="vote-count-post ">149</span>
+        <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+</div>
+
+            </td>
+            
+
+
+<td class="answercell">
+    <div class="post-text" itemprop="text">
+<p>Nikie's answer solved my problem, but his answer was in Mathematica. So I thought I should give its OpenCV adaptation here. But after implementing I could see that OpenCV code is much bigger than nikie's mathematica code. And also, I couldn't find interpolation method done by nikie in OpenCV ( although it can be done using scipy, i will tell it when time comes.)</p>
+
+<p><strong>1. Image PreProcessing ( closing operation )</strong></p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="kwd">import</span><span class="pln"> cv2
+</span><span class="kwd">import</span><span class="pln"> numpy </span><span class="kwd">as</span><span class="pln"> np
+
+img </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">imread</span><span class="pun">(</span><span class="str">'dave.jpg'</span><span class="pun">)</span><span class="pln">
+img </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="typ">GaussianBlur</span><span class="pun">(</span><span class="pln">img</span><span class="pun">,(</span><span class="lit">5</span><span class="pun">,</span><span class="lit">5</span><span class="pun">),</span><span class="lit">0</span><span class="pun">)</span><span class="pln">
+gray </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">cvtColor</span><span class="pun">(</span><span class="pln">img</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">COLOR_BGR2GRAY</span><span class="pun">)</span><span class="pln">
+mask </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">zeros</span><span class="pun">((</span><span class="pln">gray</span><span class="pun">.</span><span class="pln">shape</span><span class="pun">),</span><span class="pln">np</span><span class="pun">.</span><span class="pln">uint8</span><span class="pun">)</span><span class="pln">
+kernel1 </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">getStructuringElement</span><span class="pun">(</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_ELLIPSE</span><span class="pun">,(</span><span class="lit">11</span><span class="pun">,</span><span class="lit">11</span><span class="pun">))</span><span class="pln">
+
+close </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">morphologyEx</span><span class="pun">(</span><span class="pln">gray</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_CLOSE</span><span class="pun">,</span><span class="pln">kernel1</span><span class="pun">)</span><span class="pln">
+div </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">float32</span><span class="pun">(</span><span class="pln">gray</span><span class="pun">)/(</span><span class="pln">close</span><span class="pun">)</span><span class="pln">
+res </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">uint8</span><span class="pun">(</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">normalize</span><span class="pun">(</span><span class="pln">div</span><span class="pun">,</span><span class="pln">div</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">NORM_MINMAX</span><span class="pun">))</span><span class="pln">
+res2 </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">cvtColor</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">COLOR_GRAY2BGR</span><span class="pun">)</span></code></pre>
+
+<p>Result :</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/VFgm5.png" alt="Result of closing"></p>
+
+<p><strong>2. Finding Sudoku Square and Creating Mask Image</strong></p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">thresh </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">adaptiveThreshold</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">1</span><span class="pun">,</span><span class="lit">19</span><span class="pun">,</span><span class="lit">2</span><span class="pun">)</span><span class="pln">
+contour</span><span class="pun">,</span><span class="pln">hier </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">findContours</span><span class="pun">(</span><span class="pln">thresh</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">RETR_TREE</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">CHAIN_APPROX_SIMPLE</span><span class="pun">)</span><span class="pln">
+
+max_area </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pln">
+best_cnt </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">None</span><span class="pln">
+</span><span class="kwd">for</span><span class="pln"> cnt </span><span class="kwd">in</span><span class="pln"> contour</span><span class="pun">:</span><span class="pln">
+    area </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">contourArea</span><span class="pun">(</span><span class="pln">cnt</span><span class="pun">)</span><span class="pln">
+    </span><span class="kwd">if</span><span class="pln"> area </span><span class="pun">&gt;</span><span class="pln"> </span><span class="lit">1000</span><span class="pun">:</span><span class="pln">
+        </span><span class="kwd">if</span><span class="pln"> area </span><span class="pun">&gt;</span><span class="pln"> max_area</span><span class="pun">:</span><span class="pln">
+            max_area </span><span class="pun">=</span><span class="pln"> area
+            best_cnt </span><span class="pun">=</span><span class="pln"> cnt
+
+cv2</span><span class="pun">.</span><span class="pln">drawContours</span><span class="pun">(</span><span class="pln">mask</span><span class="pun">,[</span><span class="pln">best_cnt</span><span class="pun">],</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,-</span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+cv2</span><span class="pun">.</span><span class="pln">drawContours</span><span class="pun">(</span><span class="pln">mask</span><span class="pun">,[</span><span class="pln">best_cnt</span><span class="pun">],</span><span class="lit">0</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">2</span><span class="pun">)</span><span class="pln">
+
+res </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">bitwise_and</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln">mask</span><span class="pun">)</span></code></pre>
+
+<p>Result :</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/bJdQp.png" alt="enter image description here"></p>
+
+<p><strong>3. Finding Vertical lines</strong></p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">kernelx </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">getStructuringElement</span><span class="pun">(</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_RECT</span><span class="pun">,(</span><span class="lit">2</span><span class="pun">,</span><span class="lit">10</span><span class="pun">))</span><span class="pln">
+
+dx </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="typ">Sobel</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">CV_16S</span><span class="pun">,</span><span class="lit">1</span><span class="pun">,</span><span class="lit">0</span><span class="pun">)</span><span class="pln">
+dx </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">convertScaleAbs</span><span class="pun">(</span><span class="pln">dx</span><span class="pun">)</span><span class="pln">
+cv2</span><span class="pun">.</span><span class="pln">normalize</span><span class="pun">(</span><span class="pln">dx</span><span class="pun">,</span><span class="pln">dx</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">NORM_MINMAX</span><span class="pun">)</span><span class="pln">
+ret</span><span class="pun">,</span><span class="pln">close </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">threshold</span><span class="pun">(</span><span class="pln">dx</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">THRESH_BINARY</span><span class="pun">+</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">THRESH_OTSU</span><span class="pun">)</span><span class="pln">
+close </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">morphologyEx</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_DILATE</span><span class="pun">,</span><span class="pln">kernelx</span><span class="pun">,</span><span class="pln">iterations </span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+
+contour</span><span class="pun">,</span><span class="pln"> hier </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">findContours</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">RETR_EXTERNAL</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">CHAIN_APPROX_SIMPLE</span><span class="pun">)</span><span class="pln">
+</span><span class="kwd">for</span><span class="pln"> cnt </span><span class="kwd">in</span><span class="pln"> contour</span><span class="pun">:</span><span class="pln">
+    x</span><span class="pun">,</span><span class="pln">y</span><span class="pun">,</span><span class="pln">w</span><span class="pun">,</span><span class="pln">h </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">boundingRect</span><span class="pun">(</span><span class="pln">cnt</span><span class="pun">)</span><span class="pln">
+    </span><span class="kwd">if</span><span class="pln"> h</span><span class="pun">/</span><span class="pln">w </span><span class="pun">&gt;</span><span class="pln"> </span><span class="lit">5</span><span class="pun">:</span><span class="pln">
+        cv2</span><span class="pun">.</span><span class="pln">drawContours</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,[</span><span class="pln">cnt</span><span class="pun">],</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,-</span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+    </span><span class="kwd">else</span><span class="pun">:</span><span class="pln">
+        cv2</span><span class="pun">.</span><span class="pln">drawContours</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,[</span><span class="pln">cnt</span><span class="pun">],</span><span class="lit">0</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,-</span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+close </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">morphologyEx</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_CLOSE</span><span class="pun">,</span><span class="kwd">None</span><span class="pun">,</span><span class="pln">iterations </span><span class="pun">=</span><span class="pln"> </span><span class="lit">2</span><span class="pun">)</span><span class="pln">
+closex </span><span class="pun">=</span><span class="pln"> close</span><span class="pun">.</span><span class="pln">copy</span><span class="pun">()</span></code></pre>
+
+<p>Result :</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/GVu0x.png" alt="enter image description here"></p>
+
+<p><strong>4. Finding Horizontal Lines</strong></p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">kernely </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">getStructuringElement</span><span class="pun">(</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_RECT</span><span class="pun">,(</span><span class="lit">10</span><span class="pun">,</span><span class="lit">2</span><span class="pun">))</span><span class="pln">
+dy </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="typ">Sobel</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">CV_16S</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">2</span><span class="pun">)</span><span class="pln">
+dy </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">convertScaleAbs</span><span class="pun">(</span><span class="pln">dy</span><span class="pun">)</span><span class="pln">
+cv2</span><span class="pun">.</span><span class="pln">normalize</span><span class="pun">(</span><span class="pln">dy</span><span class="pun">,</span><span class="pln">dy</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">NORM_MINMAX</span><span class="pun">)</span><span class="pln">
+ret</span><span class="pun">,</span><span class="pln">close </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">threshold</span><span class="pun">(</span><span class="pln">dy</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">THRESH_BINARY</span><span class="pun">+</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">THRESH_OTSU</span><span class="pun">)</span><span class="pln">
+close </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">morphologyEx</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_DILATE</span><span class="pun">,</span><span class="pln">kernely</span><span class="pun">)</span><span class="pln">
+
+contour</span><span class="pun">,</span><span class="pln"> hier </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">findContours</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">RETR_EXTERNAL</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">CHAIN_APPROX_SIMPLE</span><span class="pun">)</span><span class="pln">
+</span><span class="kwd">for</span><span class="pln"> cnt </span><span class="kwd">in</span><span class="pln"> contour</span><span class="pun">:</span><span class="pln">
+    x</span><span class="pun">,</span><span class="pln">y</span><span class="pun">,</span><span class="pln">w</span><span class="pun">,</span><span class="pln">h </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">boundingRect</span><span class="pun">(</span><span class="pln">cnt</span><span class="pun">)</span><span class="pln">
+    </span><span class="kwd">if</span><span class="pln"> w</span><span class="pun">/</span><span class="pln">h </span><span class="pun">&gt;</span><span class="pln"> </span><span class="lit">5</span><span class="pun">:</span><span class="pln">
+        cv2</span><span class="pun">.</span><span class="pln">drawContours</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,[</span><span class="pln">cnt</span><span class="pun">],</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,-</span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+    </span><span class="kwd">else</span><span class="pun">:</span><span class="pln">
+        cv2</span><span class="pun">.</span><span class="pln">drawContours</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,[</span><span class="pln">cnt</span><span class="pun">],</span><span class="lit">0</span><span class="pun">,</span><span class="lit">0</span><span class="pun">,-</span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+
+close </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">morphologyEx</span><span class="pun">(</span><span class="pln">close</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">MORPH_DILATE</span><span class="pun">,</span><span class="kwd">None</span><span class="pun">,</span><span class="pln">iterations </span><span class="pun">=</span><span class="pln"> </span><span class="lit">2</span><span class="pun">)</span><span class="pln">
+closey </span><span class="pun">=</span><span class="pln"> close</span><span class="pun">.</span><span class="pln">copy</span><span class="pun">()</span></code></pre>
+
+<p>Result :</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/9kP9q.png" alt="enter image description here"></p>
+
+<p>Of course, this one is not so good.</p>
+
+<p><strong>5. Finding Grid Points</strong></p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">res </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">bitwise_and</span><span class="pun">(</span><span class="pln">closex</span><span class="pun">,</span><span class="pln">closey</span><span class="pun">)</span></code></pre>
+
+<p>Result :</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/KrQSi.png" alt="enter image description here"></p>
+
+<p><strong>6. Correcting the defects</strong></p>
+
+<p>Here, nikie does some kind of interpolation, about which I don't have much knowledge. And i couldn't find any corresponding function for this OpenCV. (may be it is there, i don't know). </p>
+
+<p>Check out this SOF which explains how to do this using SciPy, which I don't want to use : <a href="http://stackoverflow.com/questions/10364201/image-transformation-in-opencv">Image transformation in OpenCV</a></p>
+
+<p>So, here I took 4 corners of each sub-square and applied warp Perspective to each.</p>
+
+<p>For that, first we find the centroids.</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">contour</span><span class="pun">,</span><span class="pln"> hier </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">findContours</span><span class="pun">(</span><span class="pln">res</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">RETR_LIST</span><span class="pun">,</span><span class="pln">cv2</span><span class="pun">.</span><span class="pln">CHAIN_APPROX_SIMPLE</span><span class="pun">)</span><span class="pln">
+centroids </span><span class="pun">=</span><span class="pln"> </span><span class="pun">[]</span><span class="pln">
+</span><span class="kwd">for</span><span class="pln"> cnt </span><span class="kwd">in</span><span class="pln"> contour</span><span class="pun">:</span><span class="pln">
+    mom </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">moments</span><span class="pun">(</span><span class="pln">cnt</span><span class="pun">)</span><span class="pln">
+    </span><span class="pun">(</span><span class="pln">x</span><span class="pun">,</span><span class="pln">y</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> int</span><span class="pun">(</span><span class="pln">mom</span><span class="pun">[</span><span class="str">'m10'</span><span class="pun">]/</span><span class="pln">mom</span><span class="pun">[</span><span class="str">'m00'</span><span class="pun">]),</span><span class="pln"> int</span><span class="pun">(</span><span class="pln">mom</span><span class="pun">[</span><span class="str">'m01'</span><span class="pun">]/</span><span class="pln">mom</span><span class="pun">[</span><span class="str">'m00'</span><span class="pun">])</span><span class="pln">
+    cv2</span><span class="pun">.</span><span class="pln">circle</span><span class="pun">(</span><span class="pln">img</span><span class="pun">,(</span><span class="pln">x</span><span class="pun">,</span><span class="pln">y</span><span class="pun">),</span><span class="lit">4</span><span class="pun">,(</span><span class="lit">0</span><span class="pun">,</span><span class="lit">255</span><span class="pun">,</span><span class="lit">0</span><span class="pun">),-</span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+    centroids</span><span class="pun">.</span><span class="pln">append</span><span class="pun">((</span><span class="pln">x</span><span class="pun">,</span><span class="pln">y</span><span class="pun">))</span></code></pre>
+
+<p>But resulting centroids won't be sorted. Check out below image to see their order:</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/9zm61.png" alt="enter image description here"></p>
+
+<p>So we sort them from left to right, top to bottom.</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">centroids </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">array</span><span class="pun">(</span><span class="pln">centroids</span><span class="pun">,</span><span class="pln">dtype </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">float32</span><span class="pun">)</span><span class="pln">
+c </span><span class="pun">=</span><span class="pln"> centroids</span><span class="pun">.</span><span class="pln">reshape</span><span class="pun">((</span><span class="lit">100</span><span class="pun">,</span><span class="lit">2</span><span class="pun">))</span><span class="pln">
+c2 </span><span class="pun">=</span><span class="pln"> c</span><span class="pun">[</span><span class="pln">np</span><span class="pun">.</span><span class="pln">argsort</span><span class="pun">(</span><span class="pln">c</span><span class="pun">[:,</span><span class="lit">1</span><span class="pun">])]</span><span class="pln">
+
+b </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">vstack</span><span class="pun">([</span><span class="pln">c2</span><span class="pun">[</span><span class="pln">i</span><span class="pun">*</span><span class="lit">10</span><span class="pun">:(</span><span class="pln">i</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">10</span><span class="pun">][</span><span class="pln">np</span><span class="pun">.</span><span class="pln">argsort</span><span class="pun">(</span><span class="pln">c2</span><span class="pun">[</span><span class="pln">i</span><span class="pun">*</span><span class="lit">10</span><span class="pun">:(</span><span class="pln">i</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">10</span><span class="pun">,</span><span class="lit">0</span><span class="pun">])]</span><span class="pln"> </span><span class="kwd">for</span><span class="pln"> i </span><span class="kwd">in</span><span class="pln"> xrange</span><span class="pun">(</span><span class="lit">10</span><span class="pun">)])</span><span class="pln">
+bm </span><span class="pun">=</span><span class="pln"> b</span><span class="pun">.</span><span class="pln">reshape</span><span class="pun">((</span><span class="lit">10</span><span class="pun">,</span><span class="lit">10</span><span class="pun">,</span><span class="lit">2</span><span class="pun">))</span></code></pre>
+
+<p>Now see below their order :</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/m298c.png" alt="enter image description here"></p>
+
+<p>Finally we apply the transformation and create a new image of size 450x450.</p>
+
+<pre class="lang-py prettyprint prettyprinted"><code><span class="pln">output </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">zeros</span><span class="pun">((</span><span class="lit">450</span><span class="pun">,</span><span class="lit">450</span><span class="pun">,</span><span class="lit">3</span><span class="pun">),</span><span class="pln">np</span><span class="pun">.</span><span class="pln">uint8</span><span class="pun">)</span><span class="pln">
+</span><span class="kwd">for</span><span class="pln"> i</span><span class="pun">,</span><span class="pln">j </span><span class="kwd">in</span><span class="pln"> enumerate</span><span class="pun">(</span><span class="pln">b</span><span class="pun">):</span><span class="pln">
+    ri </span><span class="pun">=</span><span class="pln"> i</span><span class="pun">/</span><span class="lit">10</span><span class="pln">
+    ci </span><span class="pun">=</span><span class="pln"> i</span><span class="pun">%</span><span class="lit">10</span><span class="pln">
+    </span><span class="kwd">if</span><span class="pln"> ci </span><span class="pun">!=</span><span class="pln"> </span><span class="lit">9</span><span class="pln"> </span><span class="kwd">and</span><span class="pln"> ri</span><span class="pun">!=</span><span class="lit">9</span><span class="pun">:</span><span class="pln">
+        src </span><span class="pun">=</span><span class="pln"> bm</span><span class="pun">[</span><span class="pln">ri</span><span class="pun">:</span><span class="pln">ri</span><span class="pun">+</span><span class="lit">2</span><span class="pun">,</span><span class="pln"> ci</span><span class="pun">:</span><span class="pln">ci</span><span class="pun">+</span><span class="lit">2</span><span class="pln"> </span><span class="pun">,</span><span class="pln"> </span><span class="pun">:].</span><span class="pln">reshape</span><span class="pun">((</span><span class="lit">4</span><span class="pun">,</span><span class="lit">2</span><span class="pun">))</span><span class="pln">
+        dst </span><span class="pun">=</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">array</span><span class="pun">(</span><span class="pln"> </span><span class="pun">[</span><span class="pln"> </span><span class="pun">[</span><span class="pln">ci</span><span class="pun">*</span><span class="lit">50</span><span class="pun">,</span><span class="pln">ri</span><span class="pun">*</span><span class="lit">50</span><span class="pun">],[(</span><span class="pln">ci</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pun">,</span><span class="pln">ri</span><span class="pun">*</span><span class="lit">50</span><span class="pun">],[</span><span class="pln">ci</span><span class="pun">*</span><span class="lit">50</span><span class="pun">,(</span><span class="pln">ri</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pun">],[(</span><span class="pln">ci</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pun">,(</span><span class="pln">ri</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pun">]</span><span class="pln"> </span><span class="pun">],</span><span class="pln"> np</span><span class="pun">.</span><span class="pln">float32</span><span class="pun">)</span><span class="pln">
+        retval </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">getPerspectiveTransform</span><span class="pun">(</span><span class="pln">src</span><span class="pun">,</span><span class="pln">dst</span><span class="pun">)</span><span class="pln">
+        warp </span><span class="pun">=</span><span class="pln"> cv2</span><span class="pun">.</span><span class="pln">warpPerspective</span><span class="pun">(</span><span class="pln">res2</span><span class="pun">,</span><span class="pln">retval</span><span class="pun">,(</span><span class="lit">450</span><span class="pun">,</span><span class="lit">450</span><span class="pun">))</span><span class="pln">
+        output</span><span class="pun">[</span><span class="pln">ri</span><span class="pun">*</span><span class="lit">50</span><span class="pun">:(</span><span class="pln">ri</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pln"> </span><span class="pun">,</span><span class="pln"> ci</span><span class="pun">*</span><span class="lit">50</span><span class="pun">:(</span><span class="pln">ci</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pun">]</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> warp</span><span class="pun">[</span><span class="pln">ri</span><span class="pun">*</span><span class="lit">50</span><span class="pun">:(</span><span class="pln">ri</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pln"> </span><span class="pun">,</span><span class="pln"> ci</span><span class="pun">*</span><span class="lit">50</span><span class="pun">:(</span><span class="pln">ci</span><span class="pun">+</span><span class="lit">1</span><span class="pun">)*</span><span class="lit">50</span><span class="pun">-</span><span class="lit">1</span><span class="pun">].</span><span class="pln">copy</span><span class="pun">()</span></code></pre>
+
+<p>Result :</p>
+
+<p><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/Docxa.png" alt="enter image description here"></p>
+
+<p>The result is almost same as nikie's, but code length is large. May be, better methods are available out there, but until then, this works OK.</p>
+
+<p>Regards
+ARK.</p>
+    </div>
+    <table class="fw">
+    <tbody><tr>
+    <td class="vt">
+<div class="post-menu"><a href="http://stackoverflow.com/a/11366549/7111640" title="short permalink to this answer" class="short-link" id="link-post-11366549">share</a><span class="lsep">|</span><a href="http://stackoverflow.com/posts/11366549/edit" class="suggest-edit-post" title="revise and improve this post">edit</a></div>                    </td>
+            
+
+
+    <td align="right" class="post-signature owner">   
+       
+
+    <div class="user-info user-hover">
+    <div class="user-action-time">
+        answered <span title="2012-07-06 16:58:32Z" class="relativetime">Jul 6 '12 at 16:58</span>
+    </div>
+    <div class="user-gravatar32">
+        <a href="http://stackoverflow.com/users/1134940/abid-rahman-k"><div class="gravatar-wrapper-32"><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/a96e438acc27c0e4961ec84a019e78c6" alt="" width="32" height="32"></div></a>
+    </div>
+    <div class="user-details">
+        <a href="http://stackoverflow.com/users/1134940/abid-rahman-k">Abid Rahman K</a>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score 27,293" dir="ltr">27.3k</span><span title="15 gold badges"><span class="badge1"></span><span class="badgecount">15</span></span><span title="89 silver badges"><span class="badge2"></span><span class="badgecount">89</span></span><span title="120 bronze badges"><span class="badge3"></span><span class="badgecount">120</span></span>
+        </div>
+    </div>
+</div>
+    </td>
+    </tr>
+    </tbody></table>
+</td>
+        </tr>
+        
+<tr>
+    <td class="votecell"></td>
+    <td>
+	    <div id="comments-11366549" class="comments ">
+		    <table>
+                <tbody data-remaining-comments-count="4" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true">
+
+
+
+    <tr id="comment-15056186" class="comment ">
+        <td class="comment-actions">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received" class="warm">7</span>
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">+1 Great answer! Deserves more upvotes</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/100724/viktor-sehr" title="7,215 reputation" class="comment-user">Viktor Sehr</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment15056186_11366549"><span title="2012-07-10 14:57:08Z" class="relativetime-clean">Jul 10 '12 at 14:57</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-15056213" class="comment ">
+        <td class="comment-actions">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received" class="cool">1</span>
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">"I prefer my application crashing than getting wrong answers." &lt;- I also agree to this 100%</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/100724/viktor-sehr" title="7,215 reputation" class="comment-user">Viktor Sehr</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment15056213_11366549"><span title="2012-07-10 14:58:08Z" class="relativetime-clean">Jul 10 '12 at 14:58</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-15056227" class="comment ">
+        <td>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                &nbsp;&nbsp;
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Thanks, Its real answer is given by Nikie. But that was in mathematica, so i just converted it to OpenCV. So the real answer has got enough upvotes, I think</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/1134940/abid-rahman-k" title="27,293 reputation" class="comment-user owner">Abid Rahman K</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment15056227_11366549"><span title="2012-07-10 14:58:27Z" class="relativetime-clean">Jul 10 '12 at 14:58</span></a></span>
+                        <span class="edited-yes" title="this comment was edited 1 time"></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-15058789" class="comment ">
+        <td>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                &nbsp;&nbsp;
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Yes I know, still the effort was worth more than one upvote</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/100724/viktor-sehr" title="7,215 reputation" class="comment-user">Viktor Sehr</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment15058789_11366549"><span title="2012-07-10 16:27:45Z" class="relativetime-clean">Jul 10 '12 at 16:27</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+    <tr id="comment-15058806" class="comment ">
+        <td>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class=" comment-score">
+                                &nbsp;&nbsp;
+                        </td>
+                        <td>
+                                &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+        <td class="comment-text">
+            <div style="display: block;" class="comment-body">
+                <span class="comment-copy">Ah didnt see you also posted the question :)</span>
+                    –&nbsp;<a href="http://stackoverflow.com/users/100724/viktor-sehr" title="7,215 reputation" class="comment-user">Viktor Sehr</a>
+                <span class="comment-date" dir="ltr"><a class="comment-link" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#comment15058806_11366549"><span title="2012-07-10 16:28:34Z" class="relativetime-clean">Jul 10 '12 at 16:28</span></a></span>
+                                                                            </div>
+                    </td>
+    </tr>
+                </tbody>
+		    </table>
+	    </div>
+
+        <div id="comments-link-11366549" data-rep="50" data-reg="true">
+
+                <a class="js-add-link comments-link  dno" title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."></a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link " title="expand to show all comments on this post" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" onclick="">show <b>4</b> more comments</a>
+        </div>         
+    </td>
+</tr>    </tbody></table>
+</div>
+
+  
+<a name="10204339"></a>
+<div id="answer-10204339" class="answer" data-answerid="10204339" itemscope="" itemtype="http://schema.org/Answer">
+    <table>
+        <tbody><tr>
+            <td class="votecell">
+                
+
+<div class="vote">
+        <input type="hidden" name="_id_" value="10204339">
+        <a class="vote-up-off" title="This answer is useful">up vote</a>
+        <span itemprop="upvoteCount" class="vote-count-post ">4</span>
+        <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+</div>
+
+            </td>
+            
+
+
+<td class="answercell">
+    <div class="post-text" itemprop="text">
+<p>You could try to use some kind of grid based modeling of you arbitrary warping. And since the sudoku already is a grid, that shouldn't be too hard.</p>
+
+<p>So you could try to detect the boundaries of each 3x3 subregion and then warp each region individually. If the detection succeeds it would give you a better approximation.</p>
+    </div>
+    <table class="fw">
+    <tbody><tr>
+    <td class="vt">
+<div class="post-menu"><a href="http://stackoverflow.com/a/10204339/7111640" title="short permalink to this answer" class="short-link" id="link-post-10204339">share</a><span class="lsep">|</span><a href="http://stackoverflow.com/posts/10204339/edit" class="suggest-edit-post" title="revise and improve this post">edit</a></div>                    </td>
+            
+
+
+    <td align="right" class="post-signature">   
+       
+
+    <div class="user-info user-hover">
+    <div class="user-action-time">
+        answered <span title="2012-04-18 06:54:09Z" class="relativetime">Apr 18 '12 at 6:54</span>
+    </div>
+    <div class="user-gravatar32">
+        <a href="http://stackoverflow.com/users/977098/sietschie"><div class="gravatar-wrapper-32"><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/2b6797b1c8c35f850f35cb9970db1a33" alt="" width="32" height="32"></div></a>
+    </div>
+    <div class="user-details">
+        <a href="http://stackoverflow.com/users/977098/sietschie">sietschie</a>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score " dir="ltr">3,693</span><span title="2 gold badges"><span class="badge1"></span><span class="badgecount">2</span></span><span title="15 silver badges"><span class="badge2"></span><span class="badgecount">15</span></span><span title="40 bronze badges"><span class="badge3"></span><span class="badgecount">40</span></span>
+        </div>
+    </div>
+</div>
+    </td>
+    </tr>
+    </tbody></table>
+</td>
+        </tr>
+        
+<tr>
+    <td class="votecell"></td>
+    <td>
+	    <div id="comments-10204339" class="comments  dno">
+		    <table>
+                <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true">
+
+                        <tr><td></td><td></td></tr>
+                </tbody>
+		    </table>
+	    </div>
+
+        <div id="comments-link-10204339" data-rep="50" data-reg="true">
+
+                <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" onclick=""></a>
+        </div>         
+    </td>
+</tr>    </tbody></table>
+</div>
+									<a name="new-answer"></a>
+						<form id="post-form" action="http://stackoverflow.com/questions/10196198/answer/submit" method="post" class="post-form">
+						    <input type="hidden" id="post-id" value="10196198">
+                            <input type="hidden" id="qualityBanWarningShown" name="qualityBanWarningShown" value="false">
+                            <input type="hidden" name="referrer" value="http://stackoverflow.com/questions/40409153/opencv-detect-rectangle">
+							<h2 class="space">Your Answer</h2>
+
+
+            <script>
+            StackExchange.ifUsing("editor", function () {
+                StackExchange.using("externalEditor", function () {
+                    StackExchange.using("snippets", function () {
+                        StackExchange.snippets.init();
+                    });
+                });
+            }, "code-snippets");
+        </script>
+    
+
+<script>
+    StackExchange.ready(function() {
+        initTagRenderer("".split(" "), "".split(" "));
+       
+        StackExchange.using("externalEditor", function() {
+                // Have to fire editor after snippets, if snippets enabled
+                if (StackExchange.settings.snippets.snippetsEnabled) {
+                    StackExchange.using("snippets", function() {
+                        createEditor();
+                    });
+                }
+                else {
+                    createEditor();
+                }
+            });
+
+            function createEditor() {
+                prepareEditor({
+                    heartbeatType: 'answer',
+                convertImagesToLinks: true,
+                reputationToPostImages: 10,
+                bindNavPrevention: true,
+                postfix: "",
+                    onDemand: false,
+                    discardSelector: ".discard-answer"
+                    ,immediatelyShowMarkdownHelp:true
+                    });
+                
+
+        }
+    });  
+</script>
+
+
+<div id="post-editor" class="post-editor js-post-editor">
+
+    <div style="position: relative;">     
+        <div class="wmd-container">
+            <div id="wmd-button-bar" class="wmd-button-bar"><ul id="wmd-button-row" class="wmd-button-row"><li class="wmd-button" id="wmd-bold-button" title="Strong &lt;strong&gt; Ctrl+B" style="left: 0px;"><span style="background-position: 0px 0px;"></span></li><li class="wmd-button" id="wmd-italic-button" title="Emphasis &lt;em&gt; Ctrl+I" style="left: 25px;"><span style="background-position: -20px 0px;"></span></li><li class="wmd-spacer wmd-spacer1" id="wmd-spacer1"></li><li class="wmd-button" id="wmd-link-button" title="Hyperlink &lt;a&gt; Ctrl+L" style="left: 75px;"><span style="background-position: -40px 0px;"></span></li><li class="wmd-button" id="wmd-quote-button" title="Blockquote &lt;blockquote&gt; Ctrl+Q" style="left: 100px;"><span style="background-position: -60px 0px;"></span></li><li class="wmd-button" id="wmd-code-button" title="Code Sample &lt;pre&gt;&lt;code&gt; Ctrl+K" style="left: 125px;"><span style="background-position: -80px 0px;"></span></li><li class="wmd-button" id="wmd-image-button" title="Image &lt;img&gt; Ctrl+G" style="left: 150px;"><span style="background-position: -100px 0px;"></span></li><li class="wmd-button wmd-snippet-button" style="left:175px" id="wmd-snippet-button" title="JavaScript/HTML/CSS snippet Ctrl-M"><span style="background-image: url(&quot;/content/Shared/balsamiq/wmd-mockup-button.png&quot;);"></span></li><li class="wmd-spacer wmd-spacer2" id="wmd-spacer2" style="left: 220px;"></li><li class="wmd-button" id="wmd-olist-button" title="Numbered List &lt;ol&gt; Ctrl+O" style="left: 225px;"><span style="background-position: -120px 0px;"></span></li><li class="wmd-button" id="wmd-ulist-button" title="Bulleted List &lt;ul&gt; Ctrl+U" style="left: 250px;"><span style="background-position: -140px 0px;"></span></li><li class="wmd-button" id="wmd-heading-button" title="Heading &lt;h1&gt;/&lt;h2&gt; Ctrl+H" style="left: 275px;"><span style="background-position: -160px 0px;"></span></li><li class="wmd-button" id="wmd-hr-button" title="Horizontal Rule &lt;hr&gt; Ctrl+R" style="left: 300px;"><span style="background-position: -180px 0px;"></span></li><li class="wmd-spacer wmd-spacer3" id="wmd-spacer3" style="left: 346px;"></li><li class="wmd-button" id="wmd-undo-button" title="Undo - Ctrl+Z" style="left: 350px;"><span style="background-position: -200px -20px;"></span></li><li class="wmd-button" id="wmd-redo-button" title="Redo - Ctrl+Shift+Z" style="left: 375px;"><span style="background-position: -220px -20px;"></span></li><li class="wmd-button wmd-help-button active-help" id="wmd-help-button" title="Markdown Editing Help" style="right: 0px;"><span style="background-position: -240px 0px;"></span></li><div id="mdhelp" class="mdhelp" style="right: -13px; width: 660px; top: 41px;">
+    <ul id="mdhelp-tabs" class="mdhelp-tabs">
+        <li data-tab="mdhelp-links" data-buttons="link">Links</li>
+        <li data-tab="mdhelp-images" data-buttons="image">Images</li>
+        <li data-tab="mdhelp-styles" data-buttons="bold,italic,heading">Styling/Headers</li>
+        <li data-tab="mdhelp-lists" data-buttons="olist,ulist">Lists</li>
+        <li data-tab="mdhelp-blockquotes" data-buttons="quote">Blockquotes</li>
+        <li data-tab="mdhelp-code" data-buttons="code">Code</li>
+        <li data-tab="mdhelp-html"> HTML </li>
+        <li style="float:right"><a href="http://stackoverflow.com/editing-help" target="_blank">advanced help »</a></li>
+    </ul>
+    
+    <div class="mdhelp-tab" id="mdhelp-links">
+            <p>
+                In most cases, a plain URL will be recognized as such and automatically linked:
+            </p>
+            <pre>Visit http://area51.stackexchange.com/ regularly!
+Use angle brackets to force linking: Have you seen &lt;http://superuser.com&gt;?
+</pre>
+            <p>
+                To create fancier links, use Markdown:
+            </p>
+                <pre>Here's [a link](http://www.example.com/)! And a reference-style link to [a panda][1].
+References don't have to be [numbers][question].
+
+ [1]: http://notfound.stackexchange.com/
+ [question]: http://english.stackexchange.com/questions/11481
+</pre>
+                <p>You can add tooltips to links:</p>
+<pre>Click [here](http://diy.stackexchange.com<span class="spaces">&nbsp;</span>"this text appears when you mouse over")!
+This works with [reference links][blog] as well.
+
+ [blog]: http://blog.stackoverflow.com/<span class="spaces">&nbsp;</span>"click here for updates"
+</pre>
+    </div>
+
+    <div class="mdhelp-tab" id="mdhelp-images">
+        <p>Images are exactly like links, but they have an exclamation point in front of them:</p>
+        <pre>![a busy cat](http://sstatic.net/Sites/stackoverflow/img/error-lolcat-problemz.jpg)
+![two muppets][1]
+
+ [1]: http://i.imgur.com/I5DFV.jpg "tooltip"
+</pre>
+        <p>
+            The word in square brackets is the alt text, which gets displayed if the browser
+ can't show the image. Be sure to include meaningful alt text for screen-reading
+ software.
+        </p>
+   
+    </div>
+    <div class="mdhelp-tab" id="mdhelp-styles">
+        <div class="col1">
+            <p>Be sure to use text styling sparingly; only where it helps readability.</p>
+                <pre>*This is italicized*, and so
+is _this_.
+
+**This is bold**, just like __this__.
+
+You can ***combine*** them
+if you ___really have to___.
+</pre>
+        
+        </div>
+        <div class="col2">
+            <p>
+                To break your text into sections, you can use headers:
+            </p>
+                <pre>A Large Header
+==============
+
+Smaller Subheader
+-----------------
+</pre>
+            <p>
+                Use hash marks if you need several levels of headers:</p>
+    <pre># Header 1 #
+## Header 2 ##
+### Header 3 ###
+</pre>
+
+            
+        </div>
+
+    </div>
+    <div class="mdhelp-tab" id="mdhelp-lists">
+        <p>Both bulleted and numbered lists are possible:</p>
+        <div class="col1">
+<pre>-<span class="spaces">&nbsp;</span>Use a minus sign for a bullet
++<span class="spaces">&nbsp;</span>Or plus sign
+*<span class="spaces">&nbsp;</span>Or an asterisk
+
+1.<span class="spaces">&nbsp;</span>Numbered lists are easy
+2.<span class="spaces">&nbsp;</span>Markdown keeps track of
+ the numbers for you
+7.<span class="spaces">&nbsp;</span>So this will be item 3.
+</pre>
+        </div>
+        <div class="col2">
+<pre>1.<span class="spaces">&nbsp;</span>Lists in a list item:
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>-<span class="spaces">&nbsp;</span>Indented four spaces.
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>*<span class="spaces">&nbsp;</span>indented eight spaces.
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>-<span class="spaces">&nbsp;</span>Four spaces again.
+2.<span class="spaces">&nbsp;&nbsp;</span>You can have multiple
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>paragraphs in a list items.
+<span class="spaces">&nbsp;</span>
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>Just be sure to indent.
+</pre>        
+        </div>
+    </div>
+
+    <div class="mdhelp-tab" id="mdhelp-blockquotes">
+        <div class="col1">
+            <pre>&gt; Create a blockquote by
+&gt; prepending “&gt;” to each line.
+&gt;
+&gt; Other formatting also works here, e.g.
+&gt;
+&gt; 1. Lists or
+&gt; 2. Headings:
+&gt;
+&gt; ## Quoted Heading ##
+</pre>
+        </div>
+        <div class="col2">
+                <p>
+                    You can even put blockquotes in blockquotes:
+                </p>
+                <pre>&gt; A standard blockquote is indented
+&gt; &gt; A nested blockquote is indented more
+&gt; &gt; &gt; &gt; You can nest to any depth.
+</pre>
+        </div>
+    </div>
+
+    <div class="mdhelp-tab" id="mdhelp-code">
+        <p>
+            To create code blocks or other preformatted text, indent by four spaces:
+        </p>
+        <pre><span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>This will be displayed in a monospaced font. The first four spaces
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>will be stripped off, but all other whitespace will be preserved.
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>Markdown and HTML are turned off in code blocks:
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;</span>&lt;i&gt;This is not italic&lt;/i&gt;, and [this is not a link](http://example.com)
+</pre>
+        <p>
+            To create not a block, but an inline code span, use backticks:
+        </p>
+        <pre>The `$` character is just a shortcut for `window.jQuery`.
+</pre>
+        <p>
+            If you want to have a preformatted block within a list, indent by eight spaces:
+        </p>
+        <pre>1. This is normal text.
+2. So is this, but now follows a code block:
+<span class="spaces">&nbsp;</span>
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Skip a line and indent eight spaces.
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>That's four spaces for the list
+<span class="spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>and four to trigger the code block.
+</pre>
+    </div>
+
+    <div class="mdhelp-tab" id="mdhelp-html">
+        <p>
+            If you need to do something that Markdown can't handle, use HTML. Note that <a href="http://meta.stackexchange.com/questions/1777/what-html-tags-are-allowed" target="_blank">we only support a very strict subset of HTML!</a>
+        </p>
+        <pre>Strikethrough humor is &lt;strike&gt;funny&lt;/strike&gt;.
+</pre>
+        <p>
+            Markdown is smart enough not to mangle your span-level HTML:
+        </p>
+        <pre>&lt;b&gt;Markdown works *fine* in here.&lt;/b&gt;
+</pre>
+        <p>
+            Block-level HTML elements have a few restrictions:
+        </p>
+        <ol>
+            <li>They must be separated from surrounding text by blank lines.</li>
+            <li>The begin and end tags of the outermost block element must not be indented.</li>
+            <li>Markdown can't be used within HTML blocks.</li>
+        </ol>
+        <br>
+        <pre>&lt;pre&gt;
+ You can &lt;em&gt;not&lt;/em&gt; use Markdown in here.
+&lt;/pre&gt;
+</pre>
+    </div>
+
+    <div class="cbt"></div>
+</div></ul></div>
+            <div style="clear: both; height: 28px;"></div><textarea id="wmd-input" class="wmd-input processed" name="post-text" cols="92" rows="15" tabindex="101" data-min-length=""></textarea>
+        <div class="grippie" style="margin-right: 0px;"></div></div>
+    </div>
+
+    <div class="fl" style="margin-top: 8px; height:24px;">&nbsp;</div>
+    <div id="draft-saved" class="draft-saved community-option fl" style="margin-top: 8px; height:24px; display:none;">draft saved</div>
+
+    <div id="draft-discarded" class="draft-discarded community-option fl" style="margin-top: 8px; height:24px; display:none;">draft discarded</div>
+
+
+
+    <div id="wmd-preview" class="wmd-preview"></div>
+    <div></div>
+    <div class="edit-block">
+        <input id="fkey" name="fkey" type="hidden" value="5029baa4ec87cc03feb79fda4da94ffc">
+        <input id="author" name="author" type="text">
+    </div>
+
+
+
+</div>
+							<div style="position: relative;">
+								
+								
+							</div>
+           
+															<div class="form-submit cbt">
+									<input id="submit-button" type="submit" value="Post Your Answer" tabindex="110">
+									<a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square#" class="btn-clear discard-answer dno">discard</a>
+								</div>
+						</form>
+
+
+
+						<h2 class="bottom-notice" data-loc="1">
+Not the answer you're looking for?							Browse other questions tagged <a href="http://stackoverflow.com/questions/tagged/python" class="post-tag" title="show questions tagged &#39;python&#39;" rel="tag">python</a> <a href="http://stackoverflow.com/questions/tagged/opencv" class="post-tag" title="show questions tagged &#39;opencv&#39;" rel="tag">opencv</a> <a href="http://stackoverflow.com/questions/tagged/computer-vision" class="post-tag" title="show questions tagged &#39;computer-vision&#39;" rel="tag">computer-vision</a> <a href="http://stackoverflow.com/questions/tagged/sudoku" class="post-tag" title="show questions tagged &#39;sudoku&#39;" rel="tag">sudoku</a>  or <a href="http://stackoverflow.com/questions/ask">ask your own question</a>.						</h2>
+			</div>
+		</div>
+				<div id="sidebar" class="show-votes">
+
+
+
+<script>
+    window.showNewUser = false;
+
+</script>
+
+<div class="module newuser newuser-greeting" id="newuser-box" style="display:none;">
+    <h4>Hello World!</h4>
+    <div>
+        <p>This is a collaboratively edited question and answer site for <b>professional and enthusiast programmers</b>. It's 100% free.</p><p>Got a question about the site itself? <a href="http://meta.stackoverflow.com/">meta</a> is the place to talk about things like what questions are appropriate, what tags we should use, etc.</p>
+        <p class="ar">
+                <a href="http://stackoverflow.com/tour?mnu=1">about »</a>&nbsp;&nbsp;&nbsp;
+            <a href="http://stackoverflow.com/help?mnu=1">help »</a>
+                &nbsp; <a href="http://meta.stackoverflow.com/">meta »</a>
+        </p>
+    </div>
+</div>
+    <script>
+    if (showNewUser) {
+        document.getElementById('newuser-box').style.display = '';
+    }
+    </script>						    <div class="module question-stats">
+			        <table id="qinfo">
+			            <tbody><tr>
+			                <td>
+			                    <p class="label-key">asked</p>
+			                </td>
+			                <td style="padding-left: 10px">
+			                    <p class="label-key" title="2012-04-17 17:39:18Z"><b>4 years ago</b></p>
+			                </td>
+			            </tr>
+			            <tr>
+			                <td>
+			                    <p class="label-key">viewed</p>
+			                </td>
+
+			                <td style="padding-left: 10px">
+			                    <p class="label-key">
+			                        <b>18701 times</b>
+			                    </p>
+			                </td>
+			            </tr>
+			                <tr>
+			                    <td>
+			                        <p class="label-key">active</p>
+			                    </td>
+			                    <td style="padding-left: 10px">
+			                        <p class="label-key"><b><a href="http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square?lastactivity" class="lastactivity-link" title="2016-05-15 16:39:33Z">6 months ago</a></b></p>
+			                    </td>
+			                </tr>
+			        </tbody></table>
+			    </div>
+			<div class="module community-bulletin" data-tracker="cb=1">
+    <div class="related">
+                <div class="bulletin-title">
+                    Upcoming Events
+                </div>
+                <hr>
+    <div class="spacer bulletin-item-important">
+        
+    <div class="bulletin-item-type"><a href="http://stackoverflow.com/election?cb=1" class="question-hyperlink"><div class="favicon favicon-stackoverflow" title="Stack Overflow"></div></a></div>
+    <div class="bulletin-item-content">
+        <a href="http://stackoverflow.com/election?cb=1" class="question-hyperlink">2016 Community Moderator Election</a>
+        <div>ends <span title="2016-11-22 20:00:00Z" class="relativetime">in 5 days</span></div>
+    </div>
+    <br class="cbt">
+</div>
+                <div class="bulletin-title">
+                    Blog
+                </div>
+                <hr>
+    <div class="spacer">
+        <div class="bulletin-item-type">
+                <a href="http://stackoverflow.blog/2016/11/How-We-Make-Money-at-Stack-Overflow-2016-Edition/?cb=1" class="question-hyperlink">
+<div class="favicon favicon-stackexchangemeta" title="Meta Stack Exchange"></div>                </a>
+            </div>
+                <div class="bulletin-item-content">
+                    <a href="http://stackoverflow.blog/2016/11/How-We-Make-Money-at-Stack-Overflow-2016-Edition/?cb=1" class="question-hyperlink">How We Make Money at Stack Overflow: 2016 Edition</a>
+                </div>
+                <br class="cbt">
+            </div>
+                <div class="bulletin-title">
+                    Featured on Meta
+                </div>
+                <hr>
+    <div class="spacer">
+        <div class="bulletin-item-type">
+                <a href="http://meta.stackoverflow.com/questions/336846/upcoming-improvements-to-job-search?cb=1" class="question-hyperlink">
+<div class="favicon favicon-stackoverflowmeta" title="Meta Stack Overflow"></div>                </a>
+            </div>
+                <div class="bulletin-item-content">
+                    <a href="http://meta.stackoverflow.com/questions/336846/upcoming-improvements-to-job-search?cb=1" class="question-hyperlink">Upcoming improvements to job search</a>
+                </div>
+                <br class="cbt">
+            </div>
+    <div class="spacer">
+        <div class="bulletin-item-type">
+                <a href="http://meta.stackoverflow.com/questions/337571/2016-stack-overflow-moderator-election-qa-questionnaire?cb=1" class="question-hyperlink">
+<div class="favicon favicon-stackoverflowmeta" title="Meta Stack Overflow"></div>                </a>
+            </div>
+                <div class="bulletin-item-content">
+                    <a href="http://meta.stackoverflow.com/questions/337571/2016-stack-overflow-moderator-election-qa-questionnaire?cb=1" class="question-hyperlink">2016 Stack Overflow Moderator Election Q&amp;A - Questionnaire</a>
+                </div>
+                <br class="cbt">
+            </div>
+    </div>
+</div>			
+			<div class="everyonelovesstackoverflow blue looking tagged clc-jobs-multi" id="hireme"><a href="http://stackoverflow.com/jobs" target="_blank" data-at="0" data-tz="1" data-ti="0" class="top "><span>Looking for a job?</span></a><div class="middle"><ul class="jobs"><li class="&quot;clc-dismissable&quot;"><div class="job-wrap"><a class="job" data-at="0" data-tz="3" data-ti="227552" href="http://stackoverflow.com/jobs/127552/intermediate-senior-linux-sysadmin-kira-systems" target="_blank" title="Intermediate/Senior Linux Sysadmin at Kira Systems. Click to learn more."><div class="title">Intermediate/Senior Linux Sysadmin</div><div><span class="company">Kira Systems</span><span class="location">Llan-non, UK</span></div><div class="opts"><span class="opt remote">Remote</span></div><span class="post-tag">amazonwebservices</span><span class="post-tag">linux</span></a></div><a class="clc-dismiss clc-non-ad" data-clc-url="//clc.stackoverflow.com/dismiss-job" data-clcparam-cid="227552" data-clcparam-ac="9575312" data-clc-tooltip="dismiss this job"><span class="clc-tooltip above-left">dismiss this job</span></a></li><li class="&quot;clc-dismissable&quot;"><div class="job-wrap"><a class="job" data-at="0" data-tz="3" data-ti="228568" href="http://stackoverflow.com/jobs/128568/senior-data-engineer-restless-bandit" target="_blank" title="Senior Data Engineer at Restless Bandit. Click to learn more."><div class="title">Senior Data Engineer</div><div><span class="company">Restless Bandit</span><span class="location">San Francisco, CA</span></div><div class="opts"><span class="opt remote">Remote</span><span class="opt relocate">Relocation</span></div><span class="post-tag highlight">python</span><span class="post-tag">spark</span></a></div><a class="clc-dismiss clc-non-ad" data-clc-url="//clc.stackoverflow.com/dismiss-job" data-clcparam-cid="228568" data-clcparam-ac="9575312" data-clc-tooltip="dismiss this job"><span class="clc-tooltip above-left">dismiss this job</span></a></li><li class="&quot;clc-dismissable&quot;"><div class="job-wrap"><a class="job" data-at="0" data-tz="3" data-ti="180560" href="http://stackoverflow.com/jobs/94577/junior-software-engineer-bending-spoons" target="_blank" title=" Junior Software Engineer at Bending Spoons. Click to learn more."><div class="title"> Junior Software Engineer </div><div><span class="company">Bending Spoons</span><span class="location">Milan, Italy</span></div><div class="opts"><span class="salary">€38,000 - €50,000</span></div><span class="post-tag highlight">python</span><span class="post-tag">objective-c</span></a></div><a class="clc-dismiss clc-non-ad" data-clc-url="//clc.stackoverflow.com/dismiss-job" data-clcparam-cid="180560" data-clcparam-ac="9575312" data-clc-tooltip="dismiss this job"><span class="clc-tooltip above-left">dismiss this job</span></a></li><li class="&quot;clc-dismissable&quot;"><div class="job-wrap"><a class="job" data-at="0" data-tz="3" data-ti="229228" href="http://stackoverflow.com/jobs/129228/backend-software-developer-embl-ebi" target="_blank" title="Backend Software Developer at EMBL-EBI. Click to learn more."><div class="title">Backend Software Developer</div><div><span class="company">EMBL-EBI</span><span class="location">Hinxton, UK</span></div><div class="opts"><span class="opt relocate">Relocation</span><span class="opt visa">Visa Sponsorship</span></div><span class="post-tag highlight">python</span><span class="post-tag">rest</span></a></div><a class="clc-dismiss clc-non-ad" data-clc-url="//clc.stackoverflow.com/dismiss-job" data-clcparam-cid="229228" data-clcparam-ac="9575312" data-clc-tooltip="dismiss this job"><span class="clc-tooltip above-left">dismiss this job</span></a></li></ul><div style="clear:both"></div></div><img class="impression" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/soi.gif" style="display:none;"></div>
+        <script>
+;(function(n){var u=Object.assign||function(n){for(var i,r,u,f,e=[],t=1;t<arguments.length;t++)e[t-1]=arguments[t];for(i=0,r=e;i<r.length;i++){u=r[i];for(f in u)n[f]=u[f]}return n},r,t,f,i;try{if(typeof[].indexOf!="function")return;if(window.attachEvent&&!window.addEventListener)return;if(r=["stackoverflow.com","serverfault.com","careers.stackoverflow.com","blog.codinghorror.com","joelonsoftware.com","www.joelonsoftware.com","talent.stackoverflow.com"],r[0]!=="*"&&r.indexOf(location.hostname)===-1)return;t=window;f=t.clc_opts?u({},window.clc_opts):{};t.clc_opts=u(n,f);void 0;t.clc_opts.autoload&&(t.clc_init=t.clc_init||[],t.clc_init.push(function(){return t.clc.load()}));i=document.createElement("script");i.async=!0;void 0;i.src=t.clc_opts.lib;document.body.appendChild(i)}catch(e){void 0}}).call(null, {"azw":true,"kt":2000,"tto":true,"autoload":true,"d":{"sb":["hireme","clc-sb"],"tlb":["careers1","clc-tlb"],"mlb":["careers3","clc-mlb"]},"allowed":["stackoverflow.com","serverfault.com","careers.stackoverflow.com","blog.codinghorror.com","joelonsoftware.com","www.joelonsoftware.com","talent.stackoverflow.com"],"h":"clc.stackoverflow.com","u":"//clc.stackoverflow.com/p.js","lib":"//cdn.sstatic.net/clc/clc.min.js?v=0b93ded9c111"});        </script>
+            <script>
+window.clcfl_request = 'AZAbkgDmlJsAAgAAAAIAAAADOAAAAHxweXRob258b3BlbmN2fGNvbXB1dGVyLXZpc2lvbnxzdWRva3V8eC11c2VyLXJlZ2lzdGVyZWR8AMIPLvGyQnVuWxM';
+                ;(function(n){var t,i;try{if(typeof[].indexOf!="function")return;if(window.attachEvent&&!window.addEventListener)return;if(n.allowed[0]!=="*"&&n.allowed.indexOf(location.hostname)===-1)return;t=window;t.clcfl=t.clcfl||{};t.clcfl_request||void 0;t.clcfl.init=t.clcfl.init||[];t.clcfl.init.push(function(n){return n.load()});t.clcfl.options=n;i=document.createElement("script");i.async=!0;i.src=n.lib;document.body.appendChild(i)}catch(r){}}).call(null, {"azw":true,"kt":2000,"tto":true,"autoload":true,"d":{"sb":["hireme","clc-sb"],"tlb":["careers1","clc-tlb"],"mlb":["careers3","clc-mlb"]},"allowed":["stackoverflow.com","serverfault.com","careers.stackoverflow.com","blog.codinghorror.com","joelonsoftware.com","www.joelonsoftware.com","talent.stackoverflow.com"],"h":"clc.stackoverflow.com","u":"//clc.stackoverflow.com/fl/markup-bg.js","lib":"//cdn.sstatic.net/clc/fl/clc.min.js?v=896d1e931c04"});
+            </script>
+			
+
+            <div class="module sidebar-linked">
+	<h4 id="h-linked">Linked</h4>
+	<div class="linked" data-tracker="lq=1">
+
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/9413216?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted large">231</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/9413216/simple-digit-recognition-ocr-in-opencv-python?noredirect=1&amp;lq=1" class="question-hyperlink">Simple Digit Recognition OCR in OpenCV-Python</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/7838487?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted default">48</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/7838487/executing-cvwarpperspective-for-a-fake-deskewing-on-a-set-of-cvpoint?noredirect=1&amp;lq=1" class="question-hyperlink">Executing cv::warpPerspective for a fake deskewing on a set of cv::Point</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/15561863?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted default">23</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/15561863/fast-image-thresholding?noredirect=1&amp;lq=1" class="question-hyperlink">Fast image thresholding</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/13639336?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted default">10</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/13639336/threshold-of-blurry-image-part-2?noredirect=1&amp;lq=1" class="question-hyperlink">Threshold of blurry image - part 2</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/13391073?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted default">15</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/13391073/adaptive-threshold-of-blurry-image?noredirect=1&amp;lq=1" class="question-hyperlink">Adaptive threshold of blurry image</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/10364201?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted default">16</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/10364201/image-transformation-in-opencv?noredirect=1&amp;lq=1" class="question-hyperlink">Image transformation in OpenCV</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/10382624?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes  default">8</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/10382624/extract-rectangle-from-contour-opencv?noredirect=1&amp;lq=1" class="question-hyperlink">Extract Rectangle From Contour OpenCV</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/27520991?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted default">4</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/27520991/opencv-best-way-to-detect-corners-on-chessboard?noredirect=1&amp;lq=1" class="question-hyperlink">opencv: Best way to detect corners on chessboard</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/13280952?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes answered-accepted default">3</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/13280952/opencv-remove-gridlines-from-sudoku-puzzle?noredirect=1&amp;lq=1" class="question-hyperlink">OpenCV - remove gridlines from Sudoku puzzle</a>
+</div>
+<div class="spacer">
+	<a href="http://stackoverflow.com/q/10395064?lq=1" title="Vote score (upvotes - downvotes)">
+		<div class="answer-votes  default">6</div>
+	</a>
+	<a href="http://stackoverflow.com/questions/10395064/detecting-sudoku-square-in-an-image?noredirect=1&amp;lq=1" class="question-hyperlink">Detecting Sudoku Square in an Image</a>
+</div>					<div class="spacer more">
+				<a href="http://stackoverflow.com/questions/linked/10196198?lq=1">see more linked questions…</a>
+			</div>
+	</div>
+</div>
+
+				<div class="module sidebar-related">
+					<h4 id="h-related">Related</h4>
+                    <div class="related js-gps-related-questions" data-tracker="rq=1">
+                        <div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/10395064?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes default">6</div></a><a href="http://stackoverflow.com/questions/10395064/detecting-sudoku-square-in-an-image?rq=1" class="question-hyperlink">Detecting Sudoku Square in an Image</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/13280952?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">3</div></a><a href="http://stackoverflow.com/questions/13280952/opencv-remove-gridlines-from-sudoku-puzzle?rq=1" class="question-hyperlink">OpenCV - remove gridlines from Sudoku puzzle</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/18143077?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes default">42</div></a><a href="http://stackoverflow.com/questions/18143077/computer-vision-filtering-convex-hulls-and-convexity-defects-with-opencv?rq=1" class="question-hyperlink">Computer Vision - filtering convex hulls and convexity defects with OpenCV</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/18542264?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">1</div></a><a href="http://stackoverflow.com/questions/18542264/opencv-removing-convexity-defects-python-to-c?rq=1" class="question-hyperlink">OpenCV - Removing convexity defects (Python to C++)</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/19853784?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">1</div></a><a href="http://stackoverflow.com/questions/19853784/how-to-detect-a-defective-led-in-an-image?rq=1" class="question-hyperlink">How to detect a defective LED in an Image</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/20772893?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted large">297</div></a><a href="http://stackoverflow.com/questions/20772893/how-to-detect-a-christmas-tree?rq=1" class="question-hyperlink">How to detect a Christmas Tree?</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/30585935?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">3</div></a><a href="http://stackoverflow.com/questions/30585935/using-python-opencv-how-would-you-extract-an-image-area-inside-a-particular-col?rq=1" class="question-hyperlink">Using Python OpenCV, How would you extract an image area inside a particular color bounding box?</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/30634372?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">14</div></a><a href="http://stackoverflow.com/questions/30634372/using-opencv-python-how-would-you-make-all-black-pixels-transparent-and-then-o?rq=1" class="question-hyperlink">Using OpenCV Python, How would you make all black pixels transparent, and then overlay it over original image</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/34199165?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes default">2</div></a><a href="http://stackoverflow.com/questions/34199165/how-to-extract-blood-vein-from-following-images-using-python-and-open?rq=1" class="question-hyperlink">How to extract blood vein from following images using python and open?</a></div><div class="spacer js-gps-track"><a href="http://stackoverflow.com/q/35968598?rq=1" title="Vote score (upvotes - downvotes)"><div class="answer-votes default">3</div></a><a href="http://stackoverflow.com/questions/35968598/how-to-find-and-measure-arc-length-within-an-image?rq=1" class="question-hyperlink">How to find and measure arc length within an image</a></div>
+                    </div>
+				</div>
+            
+<div id="hot-network-questions" class="module">
+    <h4>
+        <a href="http://stackexchange.com/questions?tab=hot" class="js-gps-track" data-gps-track="posts_hot_network.click({ item_type:1, location:11 })">
+            Hot Network Questions
+        </a>
+    </h4>
+    <ul>
+            <li>
+                <div class="favicon favicon-electronics" title="Electrical Engineering Stack Exchange"></div><a href="http://electronics.stackexchange.com/questions/269848/what-are-the-best-old-electrical-appliances-to-extract-electronic-components-fro" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:135 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    What are the best old electrical appliances to extract electronic components from?
+                </a>
+
+            </li>
+            <li>
+                <div class="favicon favicon-security" title="Information Security Stack Exchange"></div><a href="http://security.stackexchange.com/questions/142879/how-worried-should-i-be-about-getting-hacked-with-poisontap" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:162 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How worried should I be about getting hacked with PoisonTap?
+                </a>
+
+            </li>
+            <li>
+                <div class="favicon favicon-datascience" title="Data Science Stack Exchange"></div><a href="http://datascience.stackexchange.com/questions/15190/why-tensorflow-cant-fit-simple-linear-model-if-i-am-minimizing-absolute-mean-er" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:557 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Why TensorFlow can't fit simple linear model if I am minimizing absolute mean error instead of the mean squared error?
+                </a>
+
+            </li>
+            <li>
+                <div class="favicon favicon-unix" title="Unix &amp; Linux Stack Exchange"></div><a href="http://unix.stackexchange.com/questions/323610/what-does-the-letter-u-mean-in-dev-urandom" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:106 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    What does the letter 'u' mean in /dev/urandom?
+                </a>
+
+            </li>
+            <li>
+                <div class="favicon favicon-codegolf" title="Programming Puzzles &amp; Code Golf Stack Exchange"></div><a href="http://codegolf.stackexchange.com/questions/100122/finding-the-nth-prime-such-that-the-prime-1-is-divisible-by-n" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:200 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Finding The nth Prime such that the prime - 1 is divisible by n
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-scifi" title="Science Fiction &amp; Fantasy Stack Exchange"></div><a href="http://scifi.stackexchange.com/questions/145313/how-do-uss-enterprise-crew-members-receive-emails-or-other-forms-of-personal-mes" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How do USS Enterprise Crew members receive emails or other forms of personal messages?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-skeptics" title="Skeptics Stack Exchange"></div><a href="http://skeptics.stackexchange.com/questions/35912/are-human-fetal-cells-used-to-produce-pepsi" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:212 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Are human fetal cells used to produce Pepsi?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-workplace" title="The Workplace Stack Exchange"></div><a href="http://workplace.stackexchange.com/questions/79723/higher-up-doesnt-carry-around-their-security-badge-and-asks-others-to-let-them" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:423 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Higher up doesn't carry around their security badge and asks others to let them in. What should I do about this security issue?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-dba" title="Database Administrators Stack Exchange"></div><a href="http://dba.stackexchange.com/questions/155580/lock-a-table-on-purpose-without-returning-results" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:182 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Lock a table on purpose without returning results
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-academia" title="Academia Stack Exchange"></div><a href="http://academia.stackexchange.com/questions/79987/countries-where-lecture-duration-does-not-exceed-one-hour" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:415 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Countries where lecture duration does not exceed one hour
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-salesforce" title="Salesforce Stack Exchange"></div><a href="http://salesforce.stackexchange.com/questions/149186/best-practice-for-apex-code-to-create-xml-that-matches-wsdl-xsd" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:459 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Best practice for apex code to create XML that matches WSDL/XSD
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-politics" title="Politics Stack Exchange"></div><a href="http://politics.stackexchange.com/questions/13481/could-california-ratify-the-paris-agreement" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:475 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Could California Ratify the Paris Agreement?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-chess" title="Chess Stack Exchange"></div><a href="http://chess.stackexchange.com/questions/15861/does-it-make-sense-to-use-an-online-elo-rating-test-for-a-beginner-as-a-monthly" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:435 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Does it make sense to use an online ELO-rating-test for a beginner as a monthly test tool in order to see my progress?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-codegolf" title="Programming Puzzles &amp; Code Golf Stack Exchange"></div><a href="http://codegolf.stackexchange.com/questions/100192/sample-a-random-non-decreasing-sequence" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:200 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Sample a random non-decreasing sequence
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-codegolf" title="Programming Puzzles &amp; Code Golf Stack Exchange"></div><a href="http://codegolf.stackexchange.com/questions/100060/goodness-giza-golf" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:200 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Goodness Giza Golf!
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-worldbuilding" title="Worldbuilding Stack Exchange"></div><a href="http://worldbuilding.stackexchange.com/questions/61322/what-difficulty-would-the-roman-empire-have-besieging-a-fantasy-kingdoms-49m-wa" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:579 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    What difficulty would the Roman Empire have besieging a fantasy kingdom's 49m wall?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-workplace" title="The Workplace Stack Exchange"></div><a href="http://workplace.stackexchange.com/questions/79881/how-to-respond-to-your-bosss-email-about-a-coworkers-accusation" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:423 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How to respond to your boss's email about a coworker's accusation?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-dba" title="Database Administrators Stack Exchange"></div><a href="http://dba.stackexchange.com/questions/155615/when-are-column-aliases-in-from-clauses-needed" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:182 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    When are COLUMN aliases in FROM clauses needed?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-mathematica" title="Mathematica Stack Exchange"></div><a href="http://mathematica.stackexchange.com/questions/131386/one-inequality-with-two-variables" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:387 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    One inequality with two variables
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-chemistry" title="Chemistry Stack Exchange"></div><a href="http://chemistry.stackexchange.com/questions/62824/how-to-interpret-intervals-on-a-ft-ir-spectrogram-of-soil-samples" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:431 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How to interpret intervals on a FT-IR spectrogram of soil samples?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-graphicdesign" title="Graphic Design Stack Exchange"></div><a href="http://graphicdesign.stackexchange.com/questions/80320/would-this-be-considered-as-plagiarism" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:174 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Would this be considered as plagiarism?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-electronics" title="Electrical Engineering Stack Exchange"></div><a href="http://electronics.stackexchange.com/questions/269937/what-is-the-difference-between-electrical-engineering-and-electrical-engineering" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:135 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    What is the difference between electrical engineering and electrical engineering technology?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-math" title="Mathematics Stack Exchange"></div><a href="http://math.stackexchange.com/questions/2016937/why-rotational-matrices-are-not-commutative" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:69 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Why rotational matrices are not commutative?
+                </a>
+
+            </li>
+            <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="http://tex.stackexchange.com/questions/339667/how-to-draw-a-dotted-rectangle-around-part-of-equation" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:85 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How to draw a dotted rectangle around part of equation?
+                </a>
+
+            </li>
+    </ul>
+
+        
+</div>
+		</div>
+	
+<div id="feed-link">
+    <div id="feed-link-text">
+        <a href="http://stackoverflow.com/feeds/question/10196198" title="feed of this question and its answers">
+            <span class="feed-icon"></span>question feed
+        </a>
+    </div>
+</div>	<script>
+StackExchange.ready(function(){$.get('/posts/10196198/ivc/e16a');});
+</script>
+<noscript>
+    &lt;div&gt;&lt;img src="/posts/10196198/ivc/e16a" class="dno" alt="" width="0" height="0"&gt;&lt;/div&gt;
+</noscript><div style="display:none" id="prettify-lang">lang-py</div></div>
+
+    <script>
+        $('#wmd-input').one("keypress", function() {
+            $.ajax({
+                url: '/accounts/email-settings-form',
+                cache: false,
+                success: function(data) {
+                    $('#submit-button').parent().prepend(data);
+                }
+            });
+        });
+
+    </script>
+
+        </div>
+    </div><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/clc.min.js"></script><script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/clc.min(1).js"></script>
+    <div id="footer" class="categories">
+        <div class="footerwrap">            
+            <div id="footer-menu">
+                <div class="top-footer-links">
+                    <a href="http://stackoverflow.com/company/about">about us</a>
+                        <a href="http://stackoverflow.com/tour">tour</a>
+                    <a href="http://stackoverflow.com/help">help</a>
+                    <a href="http://stackoverflow.blog/?blb=1">blog</a>
+                        <a href="http://chat.stackoverflow.com/">chat</a>
+                    <a href="http://data.stackexchange.com/">data</a>
+                    <a href="http://stackexchange.com/legal">legal</a>
+                    <a href="http://stackexchange.com/legal/privacy-policy">privacy policy</a>
+                    <a href="http://stackoverflow.com/company/work-here">work here</a>
+                    <a href="http://stackexchange.com/mediakit">advertising info</a>
+
+                    <a onclick="StackExchange.switchMobile(&quot;on&quot;)">mobile</a>
+                    <b><a href="http://stackoverflow.com/contact">contact us</a></b>
+                        <b><a href="http://meta.stackoverflow.com/">feedback</a></b>
+                    
+                </div>
+                <div id="footer-sites">
+                    <table>
+    <tbody><tr>
+            <th colspan="4">
+                Technology
+            </th>
+            <th colspan="2">
+                Life / Arts
+            </th>
+            <th colspan="2">
+                Culture / Recreation
+            </th>
+            <th colspan="2">
+                Science
+            </th>
+            <th>
+                Other
+            </th>
+    </tr>
+    <tr>
+            <td>
+                <ol>
+                        <li><a href="http://stackoverflow.com/" title="professional and enthusiast programmers">Stack Overflow</a></li>
+                        <li><a href="http://serverfault.com/" title="system and network administrators">Server Fault</a></li>
+                        <li><a href="http://superuser.com/" title="computer enthusiasts and power users">Super User</a></li>
+                        <li><a href="http://webapps.stackexchange.com/" title="power users of web applications">Web Applications</a></li>
+                        <li><a href="http://askubuntu.com/" title="Ubuntu users and developers">Ask Ubuntu</a></li>
+                        <li><a href="http://webmasters.stackexchange.com/" title="pro webmasters">Webmasters</a></li>
+                        <li><a href="http://gamedev.stackexchange.com/" title="professional and independent game developers">Game Development</a></li>
+                        <li><a href="http://tex.stackexchange.com/" title="users of TeX, LaTeX, ConTeXt, and related typesetting systems">TeX - LaTeX</a></li>
+                            </ol></td><td><ol>
+                        <li><a href="http://softwareengineering.stackexchange.com/" title="professionals, academics, and students working within the systems development life cycle who care about creating, delivering, and maintaining software responsibly">Software Engineering</a></li>
+                        <li><a href="http://unix.stackexchange.com/" title="users of Linux, FreeBSD and other Un*x-like operating systems">Unix &amp; Linux</a></li>
+                        <li><a href="http://apple.stackexchange.com/" title="power users of Apple hardware and software">Ask Different (Apple)</a></li>
+                        <li><a href="http://wordpress.stackexchange.com/" title="WordPress developers and administrators">WordPress Development</a></li>
+                        <li><a href="http://gis.stackexchange.com/" title="cartographers, geographers and GIS professionals">Geographic Information Systems</a></li>
+                        <li><a href="http://electronics.stackexchange.com/" title="electronics and electrical engineering professionals, students, and enthusiasts">Electrical Engineering</a></li>
+                        <li><a href="http://android.stackexchange.com/" title="enthusiasts and power users of the Android operating system">Android Enthusiasts</a></li>
+                        <li><a href="http://security.stackexchange.com/" title="information security professionals">Information Security</a></li>
+                            </ol></td><td><ol>
+                        <li><a href="http://dba.stackexchange.com/" title="database professionals who wish to improve their database skills and learn from others in the community">Database Administrators</a></li>
+                        <li><a href="http://drupal.stackexchange.com/" title="Drupal developers and administrators">Drupal Answers</a></li>
+                        <li><a href="http://sharepoint.stackexchange.com/" title="SharePoint enthusiasts">SharePoint</a></li>
+                        <li><a href="http://ux.stackexchange.com/" title="user experience researchers and experts">User Experience</a></li>
+                        <li><a href="http://mathematica.stackexchange.com/" title="users of Mathematica">Mathematica</a></li>
+                        <li><a href="http://salesforce.stackexchange.com/" title="Salesforce administrators, implementation experts, developers and anybody in-between">Salesforce</a></li>
+                        <li><a href="http://expressionengine.stackexchange.com/" title="administrators, end users, developers and designers for ExpressionEngine® CMS">ExpressionEngine® Answers</a></li>
+                        <li><a href="http://crypto.stackexchange.com/" title="software developers, mathematicians and others interested in cryptography">Cryptography</a></li>
+                            </ol></td><td><ol>
+                        <li><a href="http://codereview.stackexchange.com/" title="peer programmer code reviews">Code Review</a></li>
+                        <li><a href="http://magento.stackexchange.com/" title="users of the Magento e-Commerce platform">Magento</a></li>
+                        <li><a href="http://dsp.stackexchange.com/" title="practitioners of the art and science of signal, image and video processing">Signal Processing</a></li>
+                        <li><a href="http://raspberrypi.stackexchange.com/" title="users and developers of hardware and software for Raspberry Pi">Raspberry Pi</a></li>
+                        <li><a href="http://codegolf.stackexchange.com/" title="programming puzzle enthusiasts and code golfers">Programming Puzzles &amp; Code Golf</a></li>
+                    
+                        <li>
+                            <a href="http://stackexchange.com/sites#technology" class="more">
+                                more (7)
+                            </a>
+                        </li>
+                </ol>
+            </td>
+            <td>
+                <ol>
+                        <li><a href="http://photo.stackexchange.com/" title="professional, enthusiast and amateur photographers">Photography</a></li>
+                        <li><a href="http://scifi.stackexchange.com/" title="science fiction and fantasy enthusiasts">Science Fiction &amp; Fantasy</a></li>
+                        <li><a href="http://graphicdesign.stackexchange.com/" title="Graphic Design professionals, students, and enthusiasts">Graphic Design</a></li>
+                        <li><a href="http://movies.stackexchange.com/" title="movie and tv enthusiasts">Movies &amp; TV</a></li>
+                        <li><a href="http://music.stackexchange.com/" title="musicians, students, and enthusiasts">Music: Practice &amp; Theory</a></li>
+                        <li><a href="http://cooking.stackexchange.com/" title="professional and amateur chefs">Seasoned Advice (cooking)</a></li>
+                        <li><a href="http://diy.stackexchange.com/" title="contractors and serious DIYers">Home Improvement</a></li>
+                        <li><a href="http://money.stackexchange.com/" title="people who want to be financially literate">Personal Finance &amp; Money</a></li>
+                            </ol></td><td><ol>
+                        <li><a href="http://academia.stackexchange.com/" title="academics and those enrolled in higher education">Academia</a></li>
+                    
+                        <li>
+                            <a href="http://stackexchange.com/sites#lifearts" class="more">
+                                more (8)
+                            </a>
+                        </li>
+                </ol>
+            </td>
+            <td>
+                <ol>
+                        <li><a href="http://english.stackexchange.com/" title="linguists, etymologists, and serious English language enthusiasts">English Language &amp; Usage</a></li>
+                        <li><a href="http://skeptics.stackexchange.com/" title="scientific skepticism">Skeptics</a></li>
+                        <li><a href="http://judaism.stackexchange.com/" title="those who base their lives on Jewish law and tradition and anyone interested in learning more">Mi Yodeya (Judaism)</a></li>
+                        <li><a href="http://travel.stackexchange.com/" title="road warriors and seasoned travelers">Travel</a></li>
+                        <li><a href="http://christianity.stackexchange.com/" title="committed Christians, experts in Christianity and those interested in learning more">Christianity</a></li>
+                        <li><a href="http://ell.stackexchange.com/" title="speakers of other languages learning English">English Language Learners</a></li>
+                        <li><a href="http://japanese.stackexchange.com/" title="students, teachers, and linguists wanting to discuss the finer points of the Japanese language">Japanese Language</a></li>
+                        <li><a href="http://gaming.stackexchange.com/" title="passionate videogamers on all platforms">Arqade (gaming)</a></li>
+                            </ol></td><td><ol>
+                        <li><a href="http://bicycles.stackexchange.com/" title="people who build and repair bicycles, people who train cycling, or commute on bicycles">Bicycles</a></li>
+                        <li><a href="http://rpg.stackexchange.com/" title="gamemasters and players of tabletop, paper-and-pencil role-playing games">Role-playing Games</a></li>
+                        <li><a href="http://anime.stackexchange.com/" title="anime and manga fans">Anime &amp; Manga</a></li>
+                        <li><a href="http://mechanics.stackexchange.com/" title="mechanics and DIY enthusiast owners of cars, trucks, and motorcycles">Motor Vehicle Maintenance &amp; Repair</a></li>
+                    
+                        <li>
+                            <a href="http://stackexchange.com/sites#culturerecreation" class="more">
+                                more (17)
+                            </a>
+                        </li>
+                </ol>
+            </td>
+            <td>
+                <ol>
+                        <li><a href="http://mathoverflow.net/" title="professional mathematicians">MathOverflow</a></li>
+                        <li><a href="http://math.stackexchange.com/" title="people studying math at any level and professionals in related fields">Mathematics</a></li>
+                        <li><a href="http://stats.stackexchange.com/" title="people interested in statistics, machine learning, data analysis, data mining, and data visualization">Cross Validated (stats)</a></li>
+                        <li><a href="http://cstheory.stackexchange.com/" title="theoretical computer scientists and researchers in related fields">Theoretical Computer Science</a></li>
+                        <li><a href="http://physics.stackexchange.com/" title="active researchers, academics and students of physics">Physics</a></li>
+                        <li><a href="http://chemistry.stackexchange.com/" title="scientists, academics, teachers and students">Chemistry</a></li>
+                        <li><a href="http://biology.stackexchange.com/" title="biology researchers, academics, and students">Biology</a></li>
+                        <li><a href="http://cs.stackexchange.com/" title="students, researchers and practitioners of computer science">Computer Science</a></li>
+                            </ol></td><td><ol>
+                        <li><a href="http://philosophy.stackexchange.com/" title="those interested in the study of the fundamental nature of knowledge, reality, and existence">Philosophy</a></li>
+                    
+                        <li>
+                            <a href="http://stackexchange.com/sites#science" class="more">
+                                more (3)
+                            </a>
+                        </li>
+                </ol>
+            </td>
+            <td>
+                <ol>
+                        <li><a href="http://meta.stackexchange.com/" title="meta-discussion of the Stack Exchange family of Q&amp;A websites">Meta Stack Exchange</a></li>
+                        <li><a href="http://stackapps.com/" title="apps, scripts, and development with the Stack Exchange API">Stack Apps</a></li>
+                        <li><a href="http://area51.stackexchange.com/" title="proposing new sites in the Stack Exchange network">Area 51</a></li>
+                        <li><a href="http://talent.stackoverflow.com/">Stack Overflow Talent</a></li>
+                    
+                </ol>
+            </td>
+    </tr>
+</tbody></table>
+                </div>
+            </div>
+            <div id="copyright">
+                site design / logo © 2016 Stack Exchange Inc; user contributions licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license">cc by-sa 3.0</a> 
+                with <a href="http://blog.stackoverflow.com/2009/06/attribution-required/" rel="license">attribution required</a>
+            </div>
+            <div id="svnrev">
+                rev 2016.11.17.4214
+            </div>
+                </div>
+    </div>
+    <noscript>
+        &lt;div id="noscript-warning"&gt;Stack Overflow works best with JavaScript enabled&lt;img src="http://pixel.quantserve.com/pixel/p-c1rF4kxgLUzNc.gif" alt="" class="dno"&gt;&lt;/div&gt;
+    </noscript>
+        <script> setTimeout(function() { $("#adzerk-user-match").remove(); }, 2000);</script>
+
+    <script>
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function() { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m);
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+            
+            ga('create', 'UA-5620270-1', {'userId': '9575312' });
+            ga('set', 'dimension1', '9575312');             ga('set', 'dimension2', '|python|opencv|computer-vision|sudoku|');             ga('send', 'pageview');
+        
+        var _qevents = _qevents || [],
+            _comscore = _comscore || [];
+        (function () {
+            var ssl='https:'==document.location.protocol,
+                s=document.getElementsByTagName('script')[0],
+                qc=document.createElement('script');
+                qc.async = true;
+                qc.src = (ssl ? 'https://secure' : 'http://edge') + '.quantserve.com/quant.js';
+                s.parentNode.insertBefore(qc, s);
+                _qevents.push({ qacct: "p-c1rF4kxgLUzNc" });
+                            var sc=document.createElement('script');
+                sc.async=true;
+                sc.src=(ssl?'https://sb':'http://b') + '.scorecardresearch.com/beacon.js';
+                s.parentNode.insertBefore(sc, s);
+                _comscore.push({ c1: "2", c2: "17440561" });
+        })();
+
+    </script>
+        
+    
+            <script type="text/javascript">
+                
+                (function(appendChild) {
+                    Node.prototype.appendChild = function() {
+                        var parent = this;
+                        var newNode = arguments[0];
+                        if (parent.nodeName === 'HEAD'
+                            && newNode
+                            && newNode.nodeName === 'SCRIPT'
+                            && newNode.src) {
+                            
+                            window.setTimeout(function() {
+                                var result = newNode.src.match(/^https:\/\/maps\.googleapis\.com\/maps\/api\/place\/js\/(\w+)Service\./i) || [];
+                                var service = result[1];
+                                if (service) {
+                                    if (service === 'Autocompletion') service =  2;
+                                    else if (service === 'Place') service = 1;
+                                    else service = 0;
+                                    StackExchange.using('gps', function() {
+                                        StackExchange.gps.track('google_maps_places_api.call', { service: service });
+                                    });
+                                }
+                            }, 0);
+                        }
+                        return appendChild.apply(this, arguments);
+                    };
+                })(Node.prototype.appendChild);
+            </script>
+    
+<script async="" src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/p.js"></script><img src="./python - How to remove convexity defects in a Sudoku square_ - Stack Overflow_files/impression.gif" class="impression" style="display: none;"></body></html>

@@ -2,6 +2,51 @@ import cv2
 import numpy as np
 import math
 
+def findGrid(thresh):
+    kernel = np.array([[0,1,0],[1,1,1],[0,1,0]], dtype=np.uint8)
+    dilate = cv2.dilate(thresh,kernel)
+
+    height, width = dilate.shape[:2]
+    mask = np.zeros((height+2, width+2), np.uint8)
+
+    ''' provare con il flood maggiore, se non corrisponde ad una provare con
+        il secondo maggiore e cosi via '''
+
+    max_dim = max(height, width)
+
+    max_area = -1
+    for i in range(max_dim):
+        r = i%height
+        c = i%width
+        if dilate[r, c] == 255:
+            area, rect = cv2.floodFill(dilate, mask, (c,r), 64) # changes on mask
+            if area > max_area:
+                max_area = area
+                point = (c,r)
+
+        c = width-1-c
+        if dilate[r, c] == 255:
+            area, rect = cv2.floodFill(dilate, mask, (c,r), 64) # changes on mask
+            if area > max_area:
+                max_area = area
+                point = (c,r)
+
+    ''' provare a trovare il flood maggiore solo per diagonali o anche mediane '''
+
+    mask = np.zeros((height+2, width+2), np.uint8) # come funziona mask????
+    area, rect = cv2.floodFill(dilate, mask, point, 255)
+
+    for r in range(height):
+        for c in range(width):
+            if dilate[r, c] == 64:
+                cv2.floodFill(dilate, mask, (c,r), 0)
+            if dilate[r, c] == 255:
+                if point[0] == c and point[1] == r:
+                    continue
+                cv2.floodFill(dilate, mask, (c,r), 0)
+
+    return cv2.erode(dilate, kernel)
+
 def drawLines(lines, image, color=64):
     for line in lines:
         if (line[1]!=0):
@@ -172,7 +217,6 @@ def mergeLines(lines, width, height):
 
             else:
                 print('undefined line')
-                print(line)
         else:
             zero = line[0] # cioe la distanza dall'origine
             groupFind = False
@@ -231,110 +275,37 @@ def main(image_src='sudoku.jpg'):
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,5,2)
     cv2.bitwise_not(thresh, thresh)
 
-    kernel = np.array([[0,1,0],[1,1,1],[0,1,0]], dtype=np.uint8)
-    dilate = cv2.dilate(thresh,kernel)
+    grid = findGrid(thresh)
 
-    height, width = dilate.shape[:2]
-    mask = np.zeros((height+2, width+2), np.uint8)
-
-    ''' provare con il flood maggiore, se non corrisponde ad una provare con
-        il secondo maggiore e cosi via '''
-
-    max_dim = max(height, width)
-
-    max_area = -1
-    for i in range(max_dim):
-        r = i%height
-        c = i%width
-        if dilate[r, c] == 255:
-            area, rect = cv2.floodFill(dilate, mask, (c,r), 64) # changes on mask
-            if area > max_area:
-                max_area = area
-                point = (c,r)
-
-        c = width-1-c
-        if dilate[r, c] == 255:
-            area, rect = cv2.floodFill(dilate, mask, (c,r), 64) # changes on mask
-            if area > max_area:
-                max_area = area
-                point = (c,r)
-
-    ''' provare a trovare il flood maggiore solo per diagonali o anche mediane '''
-
-    mask = np.zeros((height+2, width+2), np.uint8) # come funziona mask????
-    area, rect = cv2.floodFill(dilate, mask, point, 255)
-
-    for r in range(height):
-        for c in range(width):
-            if dilate[r, c] == 64:
-                cv2.floodFill(dilate, mask, (c,r), 0)
-            if dilate[r, c] == 255:
-                if point[0] == c and point[1] == r:
-                    continue
-                cv2.floodFill(dilate, mask, (c,r), 0)
-
-
-    grid = cv2.erode(dilate, kernel)
-
-    #edges = cv2.Canny(dilate,100,200, L2gradient = True)
-    #cv2.imshow('edges', edges)
+    height, width = thresh.shape[:2]
+    canvas = np.zeros((height+2, width+2), np.uint8)
 
     contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 
     cnt_max = max(contours, key=cv2.contourArea)
 
     perimeter = cv2.arcLength(cnt_max, True)
-    # print(perimeter)
     approx = cv2.approxPolyDP(cnt_max, 0.04 * perimeter, True)
-    print(approx)
-    # print(len(approx))
 
-    cv2.drawContours(mask, cnt_max, -1, 255, 1)
+    cv2.drawContours(canvas, cnt_max, -1, 255, 1)
     for point in approx:
         point = point[0]
-        cv2.circle(mask, (point[0],point[1]),   8, 255, -1)
-
-    # (x, y, w, h) = cv2.boundingRect(approx)
+        cv2.circle(canvas, (point[0],point[1]),   8, 255, -1)
 
 
-    # corners = cv2.goodFeaturesToTrack(mask,4,0.1,10)
+    # corners = cv2.goodFeaturesToTrack(canvas,4,0.1,10)
     # corners = np.int0(corners)
     #
     # for i in corners:
     #     x,y = i.ravel()
-    #     cv2.circle(mask,(x,y),5,255,-1)
-    #
+    #     cv2.circle(canvas,(x,y),5,255,-1)
+
     rect = cv2.minAreaRect(cnt_max) # (centrox, centroy), (w,h), angolo
 
     box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-    print(box)
     box = np.int0(box)
-    cv2.drawContours(mask,[box],0,64,2)
+    cv2.drawContours(canvas,[box],0,64,2)
 
-    # rect_w, rect_h = map(int, rect[1])
-    # l = max(rect_w, rect_h)
-    #
-    # pts1 = np.float32([box[1], box[2], box[0], box[3]])
-    # pts2 = np.float32([[0,0], [l-1, 0], [0,l-1], [l-1, l-1]])
-    # M = cv2.getPerspectiveTransform(pts1,pts2)
-    # dst = cv2.warpPerspective(grid,M,(l,l))
-    # cv2.imshow('distors', dst)
-
-    # # trovo punti estremi (angoli) del contorno
-    # extLeft = tuple(cnt_max[cnt_max[:, :, 0].argmin()][0])
-    # extRight = tuple(cnt_max[cnt_max[:, :, 0].argmax()][0])
-    # extTop = tuple(cnt_max[cnt_max[:, :, 1].argmin()][0])
-    # extBot = tuple(cnt_max[cnt_max[:, :, 1].argmax()][0])
-    # #cv2.drawContours(mask, cnt_max, -1, 255, 3)
-    #
-    # cv2.circle(grid, extLeft,   8, 255, -1)
-    # cv2.circle(grid, extRight,  8, 255, -1)
-    # cv2.circle(grid, extTop,    8, 255, -1)
-    # cv2.circle(grid, extBot,    8, 255, -1)
-    ''' trovare solo i contorni esterni '''
-
-    # edges = cv2.Canny(grid,50,150,apertureSize = 3)
-    # cv2.imshow('edges', edges)
 
     grid = four_point_transform(grid, box) # mi prendo e raddrizzo la porzione dell'immagine da elaborare
     # cv2.imshow('dst',grid)
@@ -348,21 +319,14 @@ def main(image_src='sudoku.jpg'):
     rr, cc = mergeLines(lines[0], *grid.shape[:2])
     drawLines(rr+cc, grid)
 
-    #cv2.circle(grid,(rect[0], rect[3]), 10, 255, -1)
-    #cv2.circle(grid,(rect[2], rect[1]), 10, 255, -1)
-
-    # vedi fitLine !!!!!!!!!!!!!!!11
-
 
     ''' trovare intersezione per trovare angoli '''
-    ''' ampliare immagine se angoli esterni '''
-    ''' adattare griglia '''
     ''' trovare tutte le righe/colonne -> celle '''
     ''' verificare se ci sono pedine/numeri -> identificarli '''
 
     cv2.imshow('source', image)
     cv2.imshow('threshold', thresh)
-    cv2.imshow('mask', mask)
+    cv2.imshow('canvas', canvas)
     cv2.imshow('grid', grid)
 
     k = cv2.waitKey(0) & 0xFF
@@ -373,7 +337,9 @@ def main(image_src='sudoku.jpg'):
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
-        main(sys.argv[1])
+        pp = sys.argv[1:]
+        for path in pp:
+            main(path)
     else:
         main()
 
