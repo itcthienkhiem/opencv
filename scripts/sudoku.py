@@ -278,7 +278,7 @@ def main(image_src='sudoku.jpg'):
     grid = findGrid(thresh)
 
     height, width = thresh.shape[:2]
-    canvas = np.zeros((height+2, width+2), np.uint8)
+    canvas = np.zeros((height, width), np.uint8)
 
     contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 
@@ -288,9 +288,9 @@ def main(image_src='sudoku.jpg'):
     approx = cv2.approxPolyDP(cnt_max, 0.04 * perimeter, True)
 
     cv2.drawContours(canvas, cnt_max, -1, 255, 1)
-    for point in approx:
-        point = point[0]
-        cv2.circle(canvas, (point[0],point[1]),   8, 255, -1)
+    # for point in approx:
+    #     point = point[0]
+    #     cv2.circle(canvas, (point[0],point[1]),   8, 255, -1)
 
 
     # corners = cv2.goodFeaturesToTrack(canvas,4,0.1,10)
@@ -304,15 +304,15 @@ def main(image_src='sudoku.jpg'):
 
     box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
     box = np.int0(box)
-    cv2.drawContours(canvas,[box],0,64,2)
+    # cv2.drawContours(canvas,[box],0,64,2)
 
 
-    grid = four_point_transform(grid, box) # mi prendo e raddrizzo la porzione dell'immagine da elaborare
+    grid = four_point_transform(grid, box) # prendo e raddrizzo la porzione dell'immagine da elaborare
     # cv2.imshow('dst',grid)
-    grid2 = grid.copy()
+    # grid2 = grid.copy()
     lines = cv2.HoughLines(grid,1,np.pi/180,200)
-    drawLines(lines[0], grid2)
-    cv2.imshow('grid2', grid2)
+    # drawLines(lines[0], grid2)
+    # cv2.imshow('grid2', grid2)
 
     ''' migliorare funzione di merge '''
     # mergeRelatedLines(lines[0], image)
@@ -320,14 +320,53 @@ def main(image_src='sudoku.jpg'):
     drawLines(rr+cc, grid)
 
 
+    height, width = canvas.shape[:2]
+    mask = np.zeros((height+2, width+2), np.uint8)
+    cv2.floodFill(canvas, mask, (width//2, height//2), 255)
+
+    threshROI = cv2.bitwise_and(thresh, canvas)
+    # cv2.imshow("h2",threshROI)
+
+    threshROIAdapted = four_point_transform(threshROI, box)
+
+    horizontalsize = 50 # threshROIAdapted.shape[1] / 30
+    horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalsize,1))
+
+    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,2))
+    horizontal = cv2.dilate(threshROIAdapted, expandeKernel) # espando un po' le linee orizzontali
+    # horizontal = cv2.erode(threshROIAdapted, expandeKernel)
+
+    horizontal = cv2.erode(horizontal, horizontalStructure)
+    horizontal = cv2.dilate(horizontal, horizontalStructure)
+
+    cv2.imshow('horizontal', horizontal)
+
+    # -------------------------
+    lines = cv2.HoughLines(horizontal,1,np.pi/180,200)
+    rr, cc = mergeLines(lines[0], *horizontal.shape[:2])
+    drawLines(rr, canvas)
+
+    # -------------------------
+    verticalsize = threshROIAdapted.shape[0] / 30
+    verticalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (1,verticalsize))
+
+    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,5))
+    vertical = cv2.dilate(threshROIAdapted, expandeKernel) # espando un po' le linee verticali
+
+    vertical = cv2.erode(vertical, verticalStructure)
+    vertical = cv2.dilate(vertical, verticalStructure)
+
+    cv2.imshow('vertical', vertical)
+
+
     ''' trovare intersezione per trovare angoli '''
     ''' trovare tutte le righe/colonne -> celle '''
     ''' verificare se ci sono pedine/numeri -> identificarli '''
 
-    cv2.imshow('source', image)
+    # cv2.imshow('source', image)
     cv2.imshow('threshold', thresh)
     cv2.imshow('canvas', canvas)
-    cv2.imshow('grid', grid)
+    # cv2.imshow('grid', grid)
 
     k = cv2.waitKey(0) & 0xFF
     if k == ord('s'):
