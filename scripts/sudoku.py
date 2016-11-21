@@ -47,6 +47,226 @@ def findGrid(thresh):
 
     return cv2.erode(dilate, kernel)
 
+def method1(image):
+    blur = cv2.GaussianBlur(image,(11,11),0)
+    thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,5,2)
+    # cv2.imshow('threshold1', thresh)
+
+    grid = findGrid(thresh) # find max flood object
+    # cv2.imshow('grid', grid)
+
+    height, width = thresh.shape[:2]
+
+    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+
+    cnt_max = max(contours, key=cv2.contourArea)
+
+    perimeter = cv2.arcLength(cnt_max, True)
+    approx = cv2.approxPolyDP(cnt_max, 0.04 * perimeter, True) # trovo presunti punti del rettangolo
+
+    # for point in approx:
+    #     point = point[0]
+    #     cv2.circle(canvas, (point[0],point[1]),   8, 255, -1)
+
+
+    # corners = cv2.goodFeaturesToTrack(canvas,4,0.1,10)
+    # corners = np.int0(corners)
+    #
+    # for i in corners:
+    #     x,y = i.ravel()
+    #     cv2.circle(canvas,(x,y),5,255,-1)
+
+    rect = cv2.minAreaRect(cnt_max) # (centrox, centroy), (w,h), angolo
+
+    box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
+    box = np.int0(box)
+    # cv2.drawContours(canvas,[box],0,64,2)
+
+
+    grid = four_point_transform(grid, box) # prendo e raddrizzo la porzione dell'immagine da elaborare
+    # cv2.imshow('dst',grid)
+    # grid2 = grid.copy()
+    lines = cv2.HoughLines(grid,1,np.pi/180,200)
+    # drawLines(lines[0], grid2)
+    # cv2.imshow('grid2', grid2)
+
+    ''' migliorare funzione di merge '''
+    # mergeRelatedLines(lines[0], image)
+    rr, cc = mergeLines(lines[0], *grid.shape[:2])
+    drawLines(rr+cc, grid)
+
+    global gridMask
+    gridMask = np.zeros((height, width), np.uint8)
+    cv2.drawContours(gridMask, cnt_max, -1, 255, thickness=cv2.cv.CV_FILLED) # ???? perche non lo riempie??
+
+    mask = np.zeros((height+2, width+2), np.uint8)
+    cv2.floodFill(gridMask, mask, (width//2, height//2), 255) # !!!!!!!!!!! riempire tutto il contorno
+
+    cv2.imshow('gridMask', gridMask)
+
+    global canvas
+    canvas = np.zeros((height, width), np.uint8)
+
+    return grid, lines, box, cnt_max
+
+
+def calcDistMiddlePoint(segment1, segment2):
+    p1, p2 = segment1
+    p3, p4 = segment2
+
+    middlePoint = ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
+
+    if (p3[0] != p4[0]):
+        m2 = (p3[1]-p4[1])/(p3[0]-p4[0])
+        q2 = p3[1]-m2*p3[0]
+
+        # distanza punto retta
+        dist = abs(middlePoint[1] - (m2*middlePoint[0] + q2)) / math.sqrt(1+m2**2)
+    else:
+        # retta verticale
+        dist = abs(p3[0]-middlePoint[0])
+
+    return dist
+
+def method2(image, cnt_max, rect):
+    # kernel = np.ones((3,3), np.uint8)
+    # close = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
+    # cv2.imshow('close', close)
+
+    blur = cv2.GaussianBlur(image,(9,9),0)
+    thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,7,2)
+    cv2.imshow('threshold2', thresh)
+
+    threshROI = cv2.bitwise_and(thresh, gridMask)
+    threshROIAdapted = four_point_transform(threshROI, rect)
+    cv2.imshow('ROItransformed', threshROIAdapted)
+
+    horizontalsize = 20 # threshROIAdapted.shape[1] / 30
+    horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalsize,1))
+
+    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,1))
+    horizontal = cv2.morphologyEx(threshROIAdapted, cv2.MORPH_CLOSE, expandeKernel, iterations=1) # piu iterazioni se immagine distorta
+    # horizontal = cv2.dilate(threshROIAdapted, expandeKernel) # espando un po' le linee orizzontali
+    # horizontal = cv2.erode(threshROIAdapted, expandeKernel)
+
+    horizontal = cv2.erode(horizontal, horizontalStructure)
+    horizontal = cv2.dilate(horizontal, horizontalStructure)
+
+    contours, hierarchy = cv2.findContours(horizontal.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+
+    for cnt in contours:
+        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
+        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
+        box = np.int0(box)
+        tl, tr, br, bl = order_points(box)
+        if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4):
+            cv2.drawContours(canvas, cnt, -1, 255, thickness=2)
+
+
+    cv2.imshow('horizontal', horizontal)
+
+    # -------------------------
+    # lines = cv2.HoughLines(horizontal,1,np.pi/180,200)
+    # rr, cc = mergeLines(lines[0], *horizontal.shape[:2])
+    # drawLines(rr, gridMask)
+
+    # -------------------------
+    verticalsize = 20 # threshROIAdapted.shape[0] / 30
+    verticalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (1,verticalsize))
+    # verticalStructure = np.array([[0,0,1,0,0]]*5+[[0,1,1,1,0]]*5+[[1,1,0,1,1]]*5, np.uint8)
+
+    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,5))
+    vertical = cv2.morphologyEx(threshROIAdapted, cv2.MORPH_CLOSE, expandeKernel, iterations=1)
+
+    vertical = cv2.erode(vertical, verticalStructure)
+    vertical = cv2.dilate(vertical, verticalStructure)
+
+    cv2.imshow('vertical', vertical)
+
+
+    contours, hierarchy = cv2.findContours(vertical.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+
+    verticalLines = list()
+    for cnt in contours:
+        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
+        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
+        box = np.int0(box)
+
+        tl, tr, br, bl = order_points(box)
+        if (abs(tl[1]-bl[1]) > vertical.shape[0]//4 and ((tl[0]-bl[0])**2+(tl[1]-bl[1])**2)/((bl[0]-br[0])**2+(bl[1]-br[1])**2) > 500):
+            verticalLines.append([tl, tr, br, bl, cnt])
+
+
+    verticalLines = sorted(verticalLines, key=lambda l: l[0][0])
+
+    tl_prec, bl_prec = verticalLines[0][0], verticalLines[0][3]
+    verticalDistances = list()
+    for i, (tl, tr, br, bl, cnt) in enumerate(verticalLines[1:]):
+        dist = calcDistMiddlePoint((tl, bl),(tl_prec, bl_prec))
+        verticalDistances.append((1+i, dist))
+        tl_prec, bl_prec = tl, bl
+
+    # verticalDistances = sorted(verticalDistances, key=lambda dist: dist[1])
+    print(verticalDistances)
+
+    groups = list()
+    temp = list()
+    for i, dist in verticalDistances:
+        if i in temp: continue
+        group = [i]
+        temp.append(i)
+        distTot = dist
+        for i2, dist2 in verticalDistances:
+            if i==i2 or i2 in temp: continue
+
+            if abs(dist-dist2) < 5:
+                distTot += dist2
+                group.append(i2)
+                temp.append(i2)
+        groups.append([group, float(distTot)/len(group)])
+
+    print(groups)
+
+    bestGroup = max(groups, key=lambda g: len(g[0]))
+
+    for g, distAvg in groups:
+        if g == bestGroup[0]: continue
+
+        tl_prec, tr, br, bl_prec, cnt = verticalLines[min(g)-1]
+        dd = list()
+        for i_cnt in g:
+            tl, tr, br, bl, cnt = verticalLines[i_cnt]
+            dist = calcDistMiddlePoint((tl, bl),(tl_prec, bl_prec))
+
+            print(dist)
+
+            dd.append([i_cnt, abs(dist-bestGroup[1])]) # bestGroup[1] -> distAvg del bestGroup
+        dd = sorted(dd, key=lambda d: d[1])
+        print(dd[0][1])
+        if dd[0][1] < 5:
+            bestGroup[0].append(dd[0][0])
+
+
+    for i_cnt in bestGroup[0]:
+        cnt = verticalLines[i_cnt][-1]
+        cv2.drawContours(canvas, cnt, -1, 100+100*i, thickness=2)
+
+    # groups = list()
+    # for i, (dist, cnt) in enumerate(verticalDistances):
+    #     for i2, (dist2, cnt2) in enumerate(verticalDistances):
+    #         if i==i2: continue
+    #
+    #         if abs(dist-dist2) < 5: # distanze simili
+    #             for g in groups:
+    #                 if abs(dist-g[0]) < 5:
+    #                     #g[0] =
+    #                     if i not in g[1]: g[1].append(i)
+    #                     if i2 not in g[1]: g[1].append(i2)
+    #
+    #
+
+    cv2.imshow('h2',canvas)
+
 def drawLines(lines, image, color=64):
     for line in lines:
         if (line[1]!=0):
@@ -271,114 +491,34 @@ def mergeLines(lines, width, height):
 
 def main(image_src='sudoku.jpg'):
     image = cv2.imread('../images/%s'%image_src, 0)
-    blur = cv2.GaussianBlur(image,(11,11),0)
-    thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,5,2)
-    cv2.bitwise_not(thresh, thresh)
 
-    grid = findGrid(thresh)
-
-    height, width = thresh.shape[:2]
-    canvas = np.zeros((height, width), np.uint8)
-
-    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
-
-    cnt_max = max(contours, key=cv2.contourArea)
-
-    perimeter = cv2.arcLength(cnt_max, True)
-    approx = cv2.approxPolyDP(cnt_max, 0.04 * perimeter, True)
-
-    cv2.drawContours(canvas, cnt_max, -1, 255, 1)
-    # for point in approx:
-    #     point = point[0]
-    #     cv2.circle(canvas, (point[0],point[1]),   8, 255, -1)
-
-
-    # corners = cv2.goodFeaturesToTrack(canvas,4,0.1,10)
-    # corners = np.int0(corners)
-    #
-    # for i in corners:
-    #     x,y = i.ravel()
-    #     cv2.circle(canvas,(x,y),5,255,-1)
-
-    rect = cv2.minAreaRect(cnt_max) # (centrox, centroy), (w,h), angolo
-
-    box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-    box = np.int0(box)
-    # cv2.drawContours(canvas,[box],0,64,2)
-
-
-    grid = four_point_transform(grid, box) # prendo e raddrizzo la porzione dell'immagine da elaborare
-    # cv2.imshow('dst',grid)
-    # grid2 = grid.copy()
-    lines = cv2.HoughLines(grid,1,np.pi/180,200)
-    # drawLines(lines[0], grid2)
-    # cv2.imshow('grid2', grid2)
-
-    ''' migliorare funzione di merge '''
-    # mergeRelatedLines(lines[0], image)
-    rr, cc = mergeLines(lines[0], *grid.shape[:2])
-    drawLines(rr+cc, grid)
-
-
-    height, width = canvas.shape[:2]
-    mask = np.zeros((height+2, width+2), np.uint8)
-    cv2.floodFill(canvas, mask, (width//2, height//2), 255)
-
-    threshROI = cv2.bitwise_and(thresh, canvas)
-    # cv2.imshow("h2",threshROI)
-
-    threshROIAdapted = four_point_transform(threshROI, box)
-
-    horizontalsize = 50 # threshROIAdapted.shape[1] / 30
-    horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalsize,1))
-
-    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,2))
-    horizontal = cv2.dilate(threshROIAdapted, expandeKernel) # espando un po' le linee orizzontali
-    # horizontal = cv2.erode(threshROIAdapted, expandeKernel)
-
-    horizontal = cv2.erode(horizontal, horizontalStructure)
-    horizontal = cv2.dilate(horizontal, horizontalStructure)
-
-    cv2.imshow('horizontal', horizontal)
-
-    # -------------------------
-    lines = cv2.HoughLines(horizontal,1,np.pi/180,200)
-    rr, cc = mergeLines(lines[0], *horizontal.shape[:2])
-    drawLines(rr, canvas)
-
-    # -------------------------
-    verticalsize = threshROIAdapted.shape[0] / 30
-    verticalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (1,verticalsize))
-
-    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,5))
-    vertical = cv2.dilate(threshROIAdapted, expandeKernel) # espando un po' le linee verticali
-
-    vertical = cv2.erode(vertical, verticalStructure)
-    vertical = cv2.dilate(vertical, verticalStructure)
-
-    cv2.imshow('vertical', vertical)
-
+    grid, lines, rect, cnt_max = method1(image)
+    method2(image, cnt_max, rect)
 
     ''' trovare intersezione per trovare angoli '''
     ''' trovare tutte le righe/colonne -> celle '''
     ''' verificare se ci sono pedine/numeri -> identificarli '''
 
     # cv2.imshow('source', image)
-    cv2.imshow('threshold', thresh)
-    cv2.imshow('canvas', canvas)
+    # cv2.imshow('gridMask', gridMask)
     # cv2.imshow('grid', grid)
 
-    k = cv2.waitKey(0) & 0xFF
-    if k == ord('s'):
-        cv2.imwrite('../images/grid.png',grid)
+    while 1:
+        k = cv2.waitKey(0) & 0xFF
+        if k == ord('s'):
+            cv2.imwrite('../images/grid.png',grid)
+            break
+        elif k == 27:
+            break
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     import sys
+
     if len(sys.argv) > 1:
         pp = sys.argv[1:]
         for path in pp:
-            main(path)
+            main("sudoku%s.jpg"%path)
     else:
         main()
 
