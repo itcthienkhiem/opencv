@@ -47,8 +47,10 @@ def findGrid(thresh):
 def mergeLines(lines, width, height):
     rows = list()
     cols = list()
+    m_avg = 0
+    nHorizLines = 0
     for line in lines:
-        if (line[1]!=0):
+        if (line[1]!=0): # theta
             m = -1/math.tan(line[1])
             c = line[0]/math.sin(line[1])
             # (0, c) (width, m*width+c)
@@ -57,33 +59,29 @@ def mergeLines(lines, width, height):
 
             """
             Una volta raddrizzata piu o meno la griglia attraverso
-            l approssimazione di un rettangolo posso considerare per le rette
-            orizzontali l intercetta c come valore circa compreso tra 0 e height
+            l approssimazione a un rettangolo posso considerare per le rette
+            orizzontali l intercetta c come valore compreso tra 0 e height
             e il coefficiente angolare m molto piccolo.
             Posso invece considerare m molto grande e c molto elevata per le
-            rette verticali.
+            rette verticali. In questo modo elimino rette completamente sbagliate.
             """
 
-            m_avg = 0
-            nLines = 0
-            if m > m_avg-0.3 and m < m_avg+0.3:
-                # rows.append(line)
+            if m > m_avg-0.3 and m < m_avg+0.3: # rette orizzontali
                 ''' creo dei gruppi secondo l'intercetta c '''
                 groupFind = False
                 for groupRow in rows:
                     c_avg, group = groupRow
-                    if c < c_avg+height/50 and c > c_avg-height/50: # da stabilire il range valido
+                    if c < c_avg+height/20 and c > c_avg-height/20: # range in cui varia c
                         groupFind = True
                         group.append(line)
                         groupRow[0] = (c_avg*(len(group)-1)+c)/len(group)
 
                 if not groupFind: rows.append([c, [line]])
 
-                m_avg = (m_avg*nLines+m)/float(nLines+1)
-                nLines += 1
+                m_avg = (m_avg*nHorizLines+m)/float(nHorizLines+1)
+                nHorizLines += 1
 
-            elif abs(m) > 3: # minima inclinazione della retta
-                # cols.append(line)
+            elif abs(m) > 3: # minima inclinazione della retta verticale
                 zero = -c/m
                 ''' creo dei gruppi secondo l'intersezione con l'asse delle ascisse '''
                 groupFind = False
@@ -97,7 +95,7 @@ def mergeLines(lines, width, height):
                 if not groupFind: cols.append([zero, [line]])
 
             else:
-                print('undefined line')
+                print('oblique line')
         else:
             zero = line[0] # cioe la distanza dall'origine
             groupFind = False
@@ -110,14 +108,11 @@ def mergeLines(lines, width, height):
 
             if not groupFind: cols.append([zero, [line]])
 
-    # sorted(rows, key=lambda r: r[0]/math.sin(r[1])) # ordinamento righe secondo intercetta
-
     print("rows: %d\ncols: %d"%(len(rows),len(cols)))
 
     ggRows = list()
     for groupRow in rows:
         c_avg, group = groupRow
-        # sorted(group, key=lambda r: r[0]/math.sin(r[1])) # ordinamento righe secondo intercetta
         diff = 100
         bestRow = None
         for row in group:
@@ -127,32 +122,32 @@ def mergeLines(lines, width, height):
                 bestRow = row
         ggRows.append(bestRow)
 
-    # for groupRow in rows:
-    #     c_avg, group = groupRow
-    #     cc = [(0, r[0]/math.sin(r[1])) for r in group]
-    #     cc = np.array(cc, dtype = np.int32)
-    #     vx,vy,x,y = cv2.fitLine(cc, cv2.cv.CV_DIST_L2,0,0.01,0.01)
-    #     yield x,y
-    #     nx,ny = 1,-vx/vy
-    #     mag = np.sqrt((1+ny**2))
-    #     vx,vy = nx/mag,ny/mag
-    #     ggRows.append(group[len(group)//2])
-
-
     ggCols = list()
     for groupCol in cols:
         zero_avg, group = groupCol
-        # sorted(group, key=lambda c: ) # !!!!!!!!!!!!!!! da ordinare
-        ggCols.append(group[len(group)//2])
 
-    # trovare solo le linee piu esterne
-    # !!!!!!!!! da restituire ordinati
+        diff = 100
+        bestCol = None
+        for col in group:
+            if col[1]!=0:
+                c = col[0]/math.sin(col[1])
+                m = -1/math.tan(col[1])
+                zero = -c/m
+            else:
+                zero = col[0]
+
+            if abs(zero_avg - zero) < diff:
+                diff = abs(zero_avg - zero)
+                bestCol = col
+
+        ggCols.append(bestCol)
+
     return ggRows, ggCols
 
 def method1(image):
     blur = cv2.GaussianBlur(image,(11,11),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,5,2)
-    cv2.imshow('threshold1', thresh)
+    # cv2.imshow('threshold1', thresh)
 
     grid = findGrid(thresh) # find max flood object
     # cv2.imshow('grid', grid)
@@ -183,7 +178,10 @@ def method1(image):
     grid = four_point_transform(grid, box) # prendo e raddrizzo la porzione dell'immagine da elaborare
 
     lines = cv2.HoughLines(grid,1,np.pi/180,200)
-    # drawLines(lines[0], grid)
+    grid2 = grid.copy()
+    drawLines(lines[0], grid2)
+    # cv2.imshow('grid2', grid2)
+
     # mergeRelatedLines(lines[0], image)
     rr, cc = mergeLines(lines[0], *grid.shape[:2])
     drawLines(rr+cc, grid)
@@ -219,7 +217,7 @@ def calcDistanceIndexCnt(i_cnt1, i_cnt2, verticalLines):
 def method2(image, cnt_max, rect):
     blur = cv2.GaussianBlur(image,(9,9),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,7,2)
-    cv2.imshow('threshold2', thresh)
+    # cv2.imshow('threshold2', thresh)
 
     height, width = thresh.shape[:2]
     gridMask = np.zeros((height, width), np.uint8)
@@ -231,10 +229,11 @@ def method2(image, cnt_max, rect):
 
     threshROI = cv2.bitwise_and(thresh, gridMask)
     threshROIAdapted = four_point_transform(threshROI, rect)
-    cv2.imshow('ROItransformed', threshROIAdapted)
+    # cv2.imshow('ROItransformed', threshROIAdapted)
 
     height, width = threshROIAdapted.shape[:2]
-    canvas = np.zeros((height, width), np.uint8)
+    h2 = np.zeros((height, width), np.uint8)
+    v2 = np.zeros((height, width), np.uint8)
 
     horizontalsize = 20 # threshROIAdapted.shape[1] / 30
     horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalsize,1))
@@ -255,10 +254,10 @@ def method2(image, cnt_max, rect):
         box = np.int0(box)
         tl, tr, br, bl = order_points(box)
         if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4):
-            cv2.drawContours(canvas, cnt, -1, 255, thickness=2)
+            cv2.drawContours(h2, cnt, -1, 255, thickness=1)
 
 
-    cv2.imshow('horizontal', horizontal)
+    # cv2.imshow('horizontal', horizontal)
 
     # -------------------------
     # lines = cv2.HoughLines(horizontal,1,np.pi/180,200)
@@ -276,7 +275,7 @@ def method2(image, cnt_max, rect):
     vertical = cv2.erode(vertical, verticalStructure)
     vertical = cv2.dilate(vertical, verticalStructure)
 
-    cv2.imshow('vertical', vertical)
+    # cv2.imshow('vertical', vertical)
 
 
     contours, hierarchy = cv2.findContours(vertical.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
@@ -339,9 +338,15 @@ def method2(image, cnt_max, rect):
 
     for i_cnt in bestGroup[0]+bugs+[0]:
         cnt = verticalLines[i_cnt][-1]
-        cv2.drawContours(canvas, cnt, -1, 100+100*i, thickness=2)
+        cv2.drawContours(v2, cnt, -1, 100+100*i, thickness=1)
 
-    cv2.imshow('h2',canvas)
+    cv2.imshow('h2',h2)
+    cv2.imshow('v2',v2)
+
+    points = cv2.bitwise_and(h2,v2)
+    # expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,4))
+    # points = cv2.morphologyEx(points, cv2.MORPH_CLOSE, expandeKernel, iterations=1)
+    cv2.imshow('intersezioni', points)
 
 def drawLines(lines, image, color=64):
     for line in lines:
@@ -355,10 +360,6 @@ def drawLines(lines, image, color=64):
             cv2.line(image,(int(line[0]),0),(int(line[0]),image.shape[0]),color,1)
 
 def order_points(pts):
-	# initialzie a list of coordinates that will be ordered
-	# such that the first entry in the list is the top-left,
-	# the second entry is the top-right, the third is the
-	# bottom-right, and the fourth is the bottom-left
 	rect = np.zeros((4, 2), dtype = "float32")
 
 	# the top-left point will have the smallest sum, whereas
@@ -378,41 +379,28 @@ def order_points(pts):
 	return rect
 
 def four_point_transform(image, pts):
-	# obtain a consistent order of the points and unpack them
-	# individually
 	rect = order_points(pts)
 	(tl, tr, br, bl) = rect
 
-	# compute the width of the new image, which will be the
-	# maximum distance between bottom-right and bottom-left
-	# x-coordiates or the top-right and top-left x-coordinates
+    # maximum width
 	widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
 	widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
 	maxWidth = max(int(widthA), int(widthB))
 
-	# compute the height of the new image, which will be the
-	# maximum distance between the top-right and bottom-right
-	# y-coordinates or the top-left and bottom-left y-coordinates
+    # maximum height
 	heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
 	heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
 	maxHeight = max(int(heightA), int(heightB))
 
-	# now that we have the dimensions of the new image, construct
-	# the set of destination points to obtain a "birds eye view",
-	# (i.e. top-down view) of the image, again specifying points
-	# in the top-left, top-right, bottom-right, and bottom-left
-	# order
 	dst = np.array([
 		[0, 0],
 		[maxWidth - 1, 0],
 		[maxWidth - 1, maxHeight - 1],
 		[0, maxHeight - 1]], dtype = "float32")
 
-	# compute the perspective transform matrix and then apply it
 	M = cv2.getPerspectiveTransform(rect, dst)
 	warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 
-	# return the warped image
 	return warped
 
 
@@ -420,7 +408,7 @@ def main(image_src='sudoku.jpg'):
     image = cv2.imread('../images/%s'%image_src, 0)
 
     grid, lines, rect, cnt_max = method1(image)
-    # method2(image, cnt_max, rect)
+    method2(image, cnt_max, rect)
 
     # cv2.imshow('source', image)
     # cv2.imshow('gridMask', gridMask)
