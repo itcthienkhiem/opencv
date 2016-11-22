@@ -182,7 +182,6 @@ def method1(image):
     drawLines(lines[0], grid2)
     # cv2.imshow('grid2', grid2)
 
-    # mergeRelatedLines(lines[0], image)
     rr, cc = mergeLines(lines[0], *grid.shape[:2])
     drawLines(rr+cc, grid)
     cv2.imshow('grid', grid)
@@ -212,6 +211,14 @@ def calcDistanceIndexCnt(i_cnt1, i_cnt2, verticalLines):
     tl1, tr, br, bl1, cnt = verticalLines[i_cnt1]
     tl2, tr, br, bl2, cnt = verticalLines[i_cnt2]
     return calcDistMiddlePoint((tl1, bl1), (tl2, bl2))
+
+def drawFilledContour(cnt, image, mask, color=255, thickness=1):
+    cv2.drawContours(image, cnt, -1, color, thickness)
+    print(cnt)
+    M = cv2.moments(cnt)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+    cv2.floodFill(image, mask, (cX, cY), 255)
 
 
 def method2(image, cnt_max, rect):
@@ -248,23 +255,24 @@ def method2(image, cnt_max, rect):
 
     contours, hierarchy = cv2.findContours(horizontal.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 
+    mask = np.zeros((h2.shape[0]+2, h2.shape[1]+2), np.uint8)
     for cnt in contours:
         rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
         box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
         box = np.int0(box)
         tl, tr, br, bl = order_points(box)
         if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4):
-            cv2.drawContours(h2, cnt, -1, 255, thickness=1)
+            cv2.drawContours(h2, cnt, -1, 255, thickness=-1)
+            # !!!!!!!! da riempire il contorno per facilitare l'individuazione dei punti di intersezione
+            # drawFilledContour(cnt, h2, mask, color=255, thickness=1)
 
 
     # cv2.imshow('horizontal', horizontal)
 
-    # -------------------------
     # lines = cv2.HoughLines(horizontal,1,np.pi/180,200)
     # rr, cc = mergeLines(lines[0], *horizontal.shape[:2])
     # drawLines(rr, gridMask)
 
-    # -------------------------
     verticalsize = 20 # threshROIAdapted.shape[0] / 30
     verticalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (1,verticalsize))
     # verticalStructure = np.array([[0,0,1,0,0]]*5+[[0,1,1,1,0]]*5+[[1,1,0,1,1]]*5, np.uint8)
@@ -336,9 +344,11 @@ def method2(image, cnt_max, rect):
                 i_cnt = i
 
 
-    for i_cnt in bestGroup[0]+bugs+[0]:
+    mask = np.zeros((v2.shape[0]+2, v2.shape[1]+2), np.uint8)
+    for i_cnt in bestGroup[0]+bugs+[0]: # assumiamo che la prima riga sia effettivamente la prima !!! da sistemare
         cnt = verticalLines[i_cnt][-1]
-        cv2.drawContours(v2, cnt, -1, 100+100*i, thickness=1)
+        cv2.drawContours(v2, cnt, -1, 255, thickness=-1)
+        # drawFilledContour(cnt, v2, mask, color=255, thickness=1)
 
     cv2.imshow('h2',h2)
     cv2.imshow('v2',v2)
@@ -346,7 +356,39 @@ def method2(image, cnt_max, rect):
     points = cv2.bitwise_and(h2,v2)
     # expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,4))
     # points = cv2.morphologyEx(points, cv2.MORPH_CLOSE, expandeKernel, iterations=1)
+
+    contours, hierarchy = cv2.findContours(points.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    points = np.zeros(points.shape[:2], np.uint8)
+    groups = list()
+    for cnt in contours:
+        x = 0
+        y = 0
+        for point in cnt:
+            point = point[0]
+            x += point[0]
+            y += point[1]
+
+        x, y = int(x/len(cnt)), int(y/len(cnt))
+
+
+        groupFind = False
+        for g in groups:
+            if abs(g[-1][0]-x)<10 and abs(g[-1][1]-y)<10:
+                g[-1] = [ (g[-1][0]*len(g[0])+x)/(len(g[0])+1), (g[-1][1]*len(g[0])+y)/(len(g[0])+1) ]
+                g[0].append((x,y))
+                groupFind = True
+        if not groupFind:
+            groups.append([[(x,y)], [x,y]])
+
+    for g in groups:
+        # print("%d %d"%(x,y))
+        cv2.circle(points, tuple(g[-1]),   0, 255, -1)
+    print("finded points: %d"%len(groups))
+
     cv2.imshow('intersezioni', points)
+    cv2.imshow('horizontal', horizontal)
+
+    return groups
 
 def drawLines(lines, image, color=64):
     for line in lines:
