@@ -111,8 +111,7 @@ def mergeLines(lines, width, height):
     print("rows: %d\ncols: %d"%(len(rows),len(cols)))
 
     ggRows = list()
-    for groupRow in rows:
-        c_avg, group = groupRow
+    for c_avg, group in rows:
         diff = 100
         bestRow = None
         for row in group:
@@ -142,15 +141,24 @@ def mergeLines(lines, width, height):
 
         ggCols.append(bestCol)
 
-    return ggRows, ggCols
+    #                                        c                                       zero
+    return sorted(ggRows, key= lambda r: r[0]/math.sin(r[1])), sorted(ggCols, key=calcZero)
 
-def method1(image):
+def calcZero(line):
+    try:
+        m = -1/math.tan(line[1])
+        c = line[0]/math.sin(line[1])
+        return -c/m
+    except:
+        return line[0]
+
+def method1(image, show_all, show):
     blur = cv2.GaussianBlur(image,(11,11),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,5,2)
-    # cv2.imshow('threshold1', thresh)
+    if show_all and show: cv2.imshow('threshold1', thresh)
 
     grid = findGrid(thresh) # find max flood object
-    # cv2.imshow('grid', grid)
+    if show_all and show: cv2.imshow('grid1', grid)
 
     contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) # senza .copy() e meglio?
     cnt_max = max(contours, key=cv2.contourArea)
@@ -180,13 +188,13 @@ def method1(image):
     lines = cv2.HoughLines(grid,1,np.pi/180,200)
     grid2 = grid.copy()
     drawLines(lines[0], grid2)
-    # cv2.imshow('grid2', grid2)
+    if show_all: cv2.imshow('all lines', grid2)
 
     rr, cc = mergeLines(lines[0], *grid.shape[:2])
     drawLines(rr+cc, grid)
     cv2.imshow('grid', grid)
 
-    return grid, lines, box, cnt_max
+    return grid, rr, cc, box, cnt_max
 
 
 def calcDistMiddlePoint(segment1, segment2):
@@ -221,10 +229,10 @@ def drawFilledContour(cnt, image, mask, color=255, thickness=1):
     cv2.floodFill(image, mask, (cX, cY), 255)
 
 
-def method2(image, cnt_max, rect):
+def method2(image, cnt_max, rect, show_all, show):
     blur = cv2.GaussianBlur(image,(9,9),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,7,2)
-    # cv2.imshow('threshold2', thresh)
+    if show_all: cv2.imshow('threshold2', thresh)
 
     height, width = thresh.shape[:2]
     gridMask = np.zeros((height, width), np.uint8)
@@ -350,8 +358,8 @@ def method2(image, cnt_max, rect):
         cv2.drawContours(v2, cnt, -1, 255, thickness=-1)
         # drawFilledContour(cnt, v2, mask, color=255, thickness=1)
 
-    cv2.imshow('h2',h2)
-    cv2.imshow('v2',v2)
+    if show_all: cv2.imshow('h2',h2)
+    if show_all: cv2.imshow('v2',v2)
 
     points = cv2.bitwise_and(h2,v2)
     # expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,4))
@@ -370,10 +378,9 @@ def method2(image, cnt_max, rect):
 
         x, y = int(x/len(cnt)), int(y/len(cnt))
 
-
         groupFind = False
         for g in groups:
-            if abs(g[-1][0]-x)<10 and abs(g[-1][1]-y)<10:
+            if abs(g[-1][0]-x)<10 and abs(g[-1][1]-y)<10: # unisco i 4 punti
                 g[-1] = [ (g[-1][0]*len(g[0])+x)/(len(g[0])+1), (g[-1][1]*len(g[0])+y)/(len(g[0])+1) ]
                 g[0].append((x,y))
                 groupFind = True
@@ -386,9 +393,9 @@ def method2(image, cnt_max, rect):
     print("finded points: %d"%len(groups))
 
     cv2.imshow('intersezioni', points)
-    cv2.imshow('horizontal', horizontal)
+    # cv2.imshow('horizontal', horizontal)
 
-    return groups
+    return groups, points
 
 def drawLines(lines, image, color=64):
     for line in lines:
@@ -445,12 +452,54 @@ def four_point_transform(image, pts):
 
 	return warped
 
+def RowColIntersection(row, col):
+    m1 = -1/math.tan(row[1])
+    c1 = row[0]/math.sin(row[1])
 
-def main(image_src='sudoku.jpg'):
-    image = cv2.imread('../images/%s'%image_src, 0)
+    if col[1] != 0:
+        m2 = -1/math.tan(col[1])
+        c2 = col[0]/math.sin(col[1])
+        x = -(c1-c2) / (m1-m2)
+    else:
+        x = col[0]
 
-    grid, lines, rect, cnt_max = method1(image)
-    method2(image, cnt_max, rect)
+    y = m1*x + c1
+    return (x,y)
+
+def calcCells(points, rr, cc):
+    # calcolo corners teorici con intersezione linee
+    # guardo se quella parte di immagine e presente, se c'e un punto vicino
+    # se non presente provo su un altro spigolo
+    # calcolo il punto orizz piu vicino, distanza massima di x
+    # sia in su che in giu, se lo trovo lo contrassegno
+    # calcolo il punto vert piu vicino, distanza massima di x
+    # sia a dx che sx, se lo trovo lo contrassegno
+    # rieseguo la funzione ricorsivamente sui punti appena trovati
+
+    # points = np.int0(map(lambda x: x[-1], points))
+    # corners = order_points(points)
+
+    tl = RowColIntersection(rr[0], cc[0])
+    tr = RowColIntersection(rr[0], cc[-1])
+    br = RowColIntersection(rr[-1], cc[-1])
+    bl = RowColIntersection(rr[-1], cc[0])
+
+    corners = (tl, tr, br, bl)
+    return corners
+
+
+def main(image_src, only_m1, show_all, show=False):
+    image = cv2.imread(image_src, 0)
+
+
+    grid, rr, cc, rect, cnt_max = method1(image, show_all, show)
+    # if not only_m1:
+    points, pointImg = method2(image, cnt_max, rect, show_all, show)
+
+    cells = calcCells(points, rr, cc)
+    # for cell in cells:
+    #     cv2.circle(pointImg, (cell[0], cell[1]),   8, 255, -1)
+    # cv2.imshow('intersezioni', pointImg)
 
     # cv2.imshow('source', image)
     # cv2.imshow('gridMask', gridMask)
@@ -459,29 +508,24 @@ def main(image_src='sudoku.jpg'):
     while 1:
         k = cv2.waitKey(0) & 0xFF
         if k == ord('s'):
-            cv2.imwrite('../images/grid.png',grid)
+            cv2.imwrite('../esempi/grid.png',grid)
+            if not only_m1: cv2.imwrite('../esempi/points.png',pointImg)
             break
         elif k == 27:
             break
     cv2.destroyAllWindows()
 
+
 if __name__ == '__main__':
     import sys
+    import argparse
 
-    if len(sys.argv) > 1:
-        pp = sys.argv[1:]
-        for path in pp:
-            main("sudoku%s.jpg"%path)
-    else:
-        main()
+    parser = argparse.ArgumentParser(description='OpenCV. Recognise a grid and extract data cells.')
 
-'''
-documento:
-    - obbiettivo
-    - dove funziona
-    - problematiche
-    - opencv e funzioni utilizzate
-    - interfaccia (libreria + linea di comando / interfaccia grafica)
-    - esempi
-    - codice
-'''
+    parser.add_argument('img', metavar='img', nargs='?', default="../images/sudoku.jpg", help='image path')
+    parser.add_argument('-a', '--show_all', dest="show_all", nargs='?', const=True, default=False, help='show all result images')
+    parser.add_argument('-m1', '--method1', dest="only_m1", nargs='?', const=True, default=False, help='execute only method 1')
+
+    args = parser.parse_args()
+
+    main("../images/%s"%args.img, args.only_m1, args.show_all, show=True)
