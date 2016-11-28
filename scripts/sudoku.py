@@ -215,19 +215,20 @@ def calcDistMiddlePoint(segment1, segment2):
 
     return dist
 
-def calcDistanceIndexCnt(i_cnt1, i_cnt2, verticalLines):
-    tl1, tr, br, bl1, cnt = verticalLines[i_cnt1]
-    tl2, tr, br, bl2, cnt = verticalLines[i_cnt2]
-    return calcDistMiddlePoint((tl1, bl1), (tl2, bl2))
+def getIntersectionPoint(intersection):
+    contours,_ = cv2.findContours(intersection,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+    if not contours: return None
 
-def drawFilledContour(cnt, image, mask, color=255, thickness=1):
-    cv2.drawContours(image, cnt, -1, color, thickness)
-    print(cnt)
-    M = cv2.moments(cnt)
-    cX = int(M["m10"] / M["m00"])
-    cY = int(M["m01"] / M["m00"])
-    cv2.floodFill(image, mask, (cX, cY), 255)
+    x_avg = 0
+    y_avg = 0
+    for cnt in contours:
+        x,y = cnt[0][0]
+        x_avg += x
+        y_avg += y
+    x_avg /= len(contours)
+    y_avg /= len(contours)
 
+    return (x_avg, y_avg)
 
 def method2(image, cnt_max, rect, show_all, show):
     blur = cv2.GaussianBlur(image,(9,9),0)
@@ -246,9 +247,6 @@ def method2(image, cnt_max, rect, show_all, show):
     threshROIAdapted = four_point_transform(threshROI, rect)
     # cv2.imshow('ROItransformed', threshROIAdapted)
 
-    height, width = threshROIAdapted.shape[:2]
-    h2 = np.zeros((height, width), np.uint8)
-    v2 = np.zeros((height, width), np.uint8)
 
     horizontalsize = 20 # threshROIAdapted.shape[1] / 30
     horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalsize,1))
@@ -263,17 +261,18 @@ def method2(image, cnt_max, rect, show_all, show):
 
     contours, hierarchy = cv2.findContours(horizontal.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 
-    mask = np.zeros((h2.shape[0]+2, h2.shape[1]+2), np.uint8)
+    rows = list()
     for cnt in contours:
         rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
         box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
         box = np.int0(box)
         tl, tr, br, bl = order_points(box)
         if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4):
-            cv2.drawContours(h2, cnt, -1, 255, thickness=-1)
-            # !!!!!!!! da riempire il contorno per facilitare l'individuazione dei punti di intersezione
-            # drawFilledContour(cnt, h2, mask, color=255, thickness=1)
-
+            rows.append((tl, tr, br, bl, cnt))
+            # cv2.drawContours(h2, cnt, -1, 255, thickness=-1)
+    rows = map( lambda r: r[-1],
+                sorted(rows, key=lambda r: r[0][1])
+              )
 
     # cv2.imshow('horizontal', horizontal)
 
@@ -352,50 +351,47 @@ def method2(image, cnt_max, rect, show_all, show):
                 i_cnt = i
 
 
-    mask = np.zeros((v2.shape[0]+2, v2.shape[1]+2), np.uint8)
+    cols = list()
     for i_cnt in bestGroup[0]+bugs+[0]: # assumiamo che la prima riga sia effettivamente la prima !!! da sistemare
         cnt = verticalLines[i_cnt][-1]
-        cv2.drawContours(v2, cnt, -1, 255, thickness=-1)
-        # drawFilledContour(cnt, v2, mask, color=255, thickness=1)
 
-    if show_all: cv2.imshow('h2',h2)
-    if show_all: cv2.imshow('v2',v2)
+        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
+        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
+        box = np.int0(box)
+        tl, tr, br, bl = order_points(box)
+        cols.append((tl, tr, br, bl, cnt))
+        # cv2.drawContours(v2, cnt, -1, 255, thickness=-1)
+    cols = map( lambda c: c[-1],
+                sorted(cols, key=lambda c: c[0][0])
+              )
 
-    points = cv2.bitwise_and(h2,v2)
-    # expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,4))
-    # points = cv2.morphologyEx(points, cv2.MORPH_CLOSE, expandeKernel, iterations=1)
+    height, width = threshROIAdapted.shape[:2]
+    points = [[None for __ in range(len(cols))] for _ in range(len(rows))]
+    canvas = np.zeros((height, width), np.uint8)
 
-    contours, hierarchy = cv2.findContours(points.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    points = np.zeros(points.shape[:2], np.uint8)
-    groups = list()
-    for cnt in contours:
-        x = 0
-        y = 0
-        for point in cnt:
-            point = point[0]
-            x += point[0]
-            y += point[1]
+    for i_r, cnt_r in enumerate(rows):
+        row_canvas = canvas.copy()
+        cv2.drawContours(row_canvas, cnt_r, -1, 255, thickness=1)
 
-        x, y = int(x/len(cnt)), int(y/len(cnt))
+        for i_c, cnt_c in enumerate(cols):
+            col_canvas = canvas.copy()
+            cv2.drawContours(col_canvas, cnt_c, -1, 255, thickness=1)
 
-        groupFind = False
-        for g in groups:
-            if abs(g[-1][0]-x)<10 and abs(g[-1][1]-y)<10: # unisco i 4 punti
-                g[-1] = [ (g[-1][0]*len(g[0])+x)/(len(g[0])+1), (g[-1][1]*len(g[0])+y)/(len(g[0])+1) ]
-                g[0].append((x,y))
-                groupFind = True
-        if not groupFind:
-            groups.append([[(x,y)], [x,y]])
+            intersection = cv2.bitwise_and(row_canvas, col_canvas)
 
-    for g in groups:
-        # print("%d %d"%(x,y))
-        cv2.circle(points, tuple(g[-1]),   0, 255, -1)
-    print("finded points: %d"%len(groups))
+            # ottengo il centro
+            point = getIntersectionPoint(intersection)
+            if point == None: print("Error: %d %d"%(i_r, i_c))
+            points[i_r][i_c] = point
 
-    cv2.imshow('intersezioni', points)
-    # cv2.imshow('horizontal', horizontal)
+    pp_canvas = canvas.copy()
+    for row_points in points:
+        for p in row_points:
+            cv2.circle(pp_canvas, p,   0, 255, -1)
+        cv2.imshow("points", pp_canvas)
+        cv2.waitKey(1000)
+    return points
 
-    return groups, points
 
 def drawLines(lines, image, color=64):
     for line in lines:
@@ -452,40 +448,6 @@ def four_point_transform(image, pts):
 
 	return warped
 
-def RowColIntersection(row, col):
-    m1 = -1/math.tan(row[1])
-    c1 = row[0]/math.sin(row[1])
-
-    if col[1] != 0:
-        m2 = -1/math.tan(col[1])
-        c2 = col[0]/math.sin(col[1])
-        x = -(c1-c2) / (m1-m2)
-    else:
-        x = col[0]
-
-    y = m1*x + c1
-    return (x,y)
-
-def calcCells(points, rr, cc):
-    # calcolo corners teorici con intersezione linee
-    # guardo se quella parte di immagine e presente, se c'e un punto vicino
-    # se non presente provo su un altro spigolo
-    # calcolo il punto orizz piu vicino, distanza massima di x
-    # sia in su che in giu, se lo trovo lo contrassegno
-    # calcolo il punto vert piu vicino, distanza massima di x
-    # sia a dx che sx, se lo trovo lo contrassegno
-    # rieseguo la funzione ricorsivamente sui punti appena trovati
-
-    # points = np.int0(map(lambda x: x[-1], points))
-    # corners = order_points(points)
-
-    tl = RowColIntersection(rr[0], cc[0])
-    tr = RowColIntersection(rr[0], cc[-1])
-    br = RowColIntersection(rr[-1], cc[-1])
-    bl = RowColIntersection(rr[-1], cc[0])
-
-    corners = (tl, tr, br, bl)
-    return corners
 
 
 def main(image_src, only_m1, show_all, show=False):
@@ -494,9 +456,9 @@ def main(image_src, only_m1, show_all, show=False):
 
     grid, rr, cc, rect, cnt_max = method1(image, show_all, show)
     # if not only_m1:
-    points, pointImg = method2(image, cnt_max, rect, show_all, show)
+    points = method2(image, cnt_max, rect, show_all, show)
 
-    cells = calcCells(points, rr, cc)
+    # cells = calcCells(points, rr, cc)
     # for cell in cells:
     #     cv2.circle(pointImg, (cell[0], cell[1]),   8, 255, -1)
     # cv2.imshow('intersezioni', pointImg)
