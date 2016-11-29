@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from numpy.linalg import norm
 import math
 
 def findGrid(thresh):
@@ -194,7 +195,7 @@ def method1(image, show_all, show):
     drawLines(rr+cc, grid)
     cv2.imshow('grid', grid)
 
-    return grid, rr, cc, box, cnt_max
+    return thresh, grid, rr, cc, box, cnt_max
 
 
 def calcDistMiddlePoint(segment1, segment2):
@@ -230,7 +231,7 @@ def getIntersectionPoint(intersection):
 
     return (x_avg, y_avg)
 
-def method2(image, cnt_max, rect, show_all, show):
+def method2(image, cnt_max, kernelTransform, show_all, show):
     blur = cv2.GaussianBlur(image,(9,9),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,7,2)
     if show_all: cv2.imshow('threshold2', thresh)
@@ -240,12 +241,12 @@ def method2(image, cnt_max, rect, show_all, show):
     cv2.drawContours(gridMask, cnt_max, -1, 255, thickness=cv2.cv.CV_FILLED) # ???? perche non lo riempie??
     mask = np.zeros((height+2, width+2), np.uint8)
 
-    tl, tr, br, bl = order_points(rect)
+    tl, tr, br, bl = order_points(kernelTransform)
     cv2.floodFill(gridMask, mask, (int(br[0]+tl[0])/2, int(br[1]+tl[1])/2), 255) # !!!!!!!!!!! riempire tutto il contorno
 
     threshROI = cv2.bitwise_and(thresh, gridMask)
-    threshROIAdapted = four_point_transform(threshROI, rect)
-    # cv2.imshow('ROItransformed', threshROIAdapted)
+    threshROIAdapted = four_point_transform(threshROI, kernelTransform)
+    if show_all: cv2.imshow('ROItransformed', threshROIAdapted)
 
 
     horizontalsize = 20 # threshROIAdapted.shape[1] / 30
@@ -389,8 +390,8 @@ def method2(image, cnt_max, rect, show_all, show):
         for p in row_points:
             cv2.circle(pp_canvas, p,   0, 255, -1)
         cv2.imshow("points", pp_canvas)
-        cv2.waitKey(1000)
-    return points
+        # cv2.waitKey(1000)
+    return points, pp_canvas
 
 
 def drawLines(lines, image, color=64):
@@ -449,19 +450,113 @@ def four_point_transform(image, pts):
 	return warped
 
 
+def extractCells(points, thresh, kernelTransform):
+    threshAdapted = four_point_transform(thresh, kernelTransform)
+
+    gridImages = [[None for __ in range(len(points[0]))] for _ in range(len(points))]
+
+    for r, row_points in enumerate(points[:-1]):
+        for c, point1 in enumerate(row_points[:-1]):
+            point2 = points[r+1][c]
+            point3 = points[r][c+1]
+            point4 = points[r+1][c+1]
+            if point1 and point2 and point3 and point4:
+                cell = np.int0((point1, point2, point3, point4))
+                imgCell = four_point_transform(threshAdapted, cell)
+                gridImages[r][c] = imgCell
+                # cv2.imshow("%d,%d"%(r,c), imgCell)
+
+    return gridImages
+
+def deskew(img):
+    m = cv2.moments(img)
+    if abs(m['mu02']) < 1e-2:
+        return img.copy()
+    skew = m['mu11']/m['mu02']
+    M = np.float32([[1, skew, -0.5*20*skew], [0, 1, 0]])
+    img = cv2.warpAffine(img, M, (20, 20), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
+    return img
+
+def preprocess_hog(digits):
+    samples = []
+    for img in digits:
+        gx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+        gy = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+        mag, ang = cv2.cartToPolar(gx, gy)
+        bin_n = 16
+        bin = np.int32(bin_n*ang/(2*np.pi))
+        bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
+        mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
+        hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]
+        hist = np.hstack(hists)
+
+        # transform to Hellinger kernel
+        eps = 1e-7
+        hist /= hist.sum() + eps
+        hist = np.sqrt(hist)
+        hist /= norm(hist) + eps
+
+        samples.append(hist)
+    return np.float32(samples)
+
+def preprocess_simple(digits):
+    return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
+
+def extractNumbers(cells):
+    digits_img = cv2.imread("../images/digits.png", 0)
+    h, w = digits_img.shape[:2]
+    sx, sy = (20, 20) # cell dimensions
+    digits = [np.hsplit(row, w//sx) for row in np.vsplit(digits_img, h//sy)]
+    digits = np.array(digits)
+    digits = digits.reshape(-1, sy, sx) # raggruppo righe
+
+    labels = np.repeat(np.arange(10), len(digits)/10) # 10 number of images for the same digit
+
+    digits2 = map(deskew, digits) # "raddrizza" l'immagine, il testo, le cifre
+    samples = preprocess_hog(digits2)
+
+    model = cv2.KNearest()
+    model.train(samples, labels)
+
+    cc = list()
+    cc_ii = [[None for __ in range(len(cells[0]))] for _ in range(len(cells))]
+
+    for r, row in enumerate(cells):
+        for c, cell in enumerate(row):
+            if cell is not None:
+                cc_ii[r][c] = r*9 + c # !!!!!!!!!!
+                #cv2.imshow("%d"%i, cell)
+                cc.append(cell)
+
+    cells = map(deskew, cc) # "raddrizza" l'immagine, il testo, le cifre
+    cells = preprocess_hog(cells)
+
+    retval, results, neigh_resp, dists = model.find_nearest(cells, 4)
+
+    nn = results.ravel()
+    print(nn)
+    print(len(nn))
+
+    for r in range(len(cc_ii)):
+        for c in range(len(cc_ii[r])):
+            if cc_ii[r][c] is not None:
+                print("%d %d -> %d"%(r,c,int(nn[cc_ii[r][c]])))
+
+    return nn
 
 def main(image_src, only_m1, show_all, show=False):
     image = cv2.imread(image_src, 0)
 
 
-    grid, rr, cc, rect, cnt_max = method1(image, show_all, show)
+    thresh, grid, rr, cc, kernelTransform, cnt_max = method1(image, show_all, show)
     # if not only_m1:
-    points = method2(image, cnt_max, rect, show_all, show)
+    points, pointsImage = method2(image, cnt_max, kernelTransform, show_all, show)
 
-    # cells = calcCells(points, rr, cc)
-    # for cell in cells:
-    #     cv2.circle(pointImg, (cell[0], cell[1]),   8, 255, -1)
-    # cv2.imshow('intersezioni', pointImg)
+    # intrecciare dati
+
+    cells = extractCells(points, thresh, kernelTransform)
+
+    nn = extractNumbers(cells)
 
     # cv2.imshow('source', image)
     # cv2.imshow('gridMask', gridMask)
@@ -470,8 +565,21 @@ def main(image_src, only_m1, show_all, show=False):
     while 1:
         k = cv2.waitKey(0) & 0xFF
         if k == ord('s'):
-            cv2.imwrite('../esempi/grid.png',grid)
-            if not only_m1: cv2.imwrite('../esempi/points.png',pointImg)
+            import os
+            folder_name = image_src.split('/')[-1].split('.')[0]
+            folder_path = "../esempi/"+folder_name
+            if not os.path.exists(folder_path):
+                os.mkdir(folder_path)
+
+            cv2.imwrite(folder_path+'/grid.png',grid)
+            if not only_m1:
+                cv2.imwrite(folder_path+'/points.png',pointsImage)
+
+                for r in range(len(cells)):
+                    for c in range(len(cells[0])):
+                        cell = cells[r][c]
+                        if cell is None: continue
+                        cv2.imwrite(folder_path+'/%d_%d.png'%(r,c),cell)
             break
         elif k == 27:
             break
