@@ -88,8 +88,11 @@ class SVM(StatModel):
         self.model = cv2.SVM()
         self.model.train(samples, responses, params = self.params)
 
-    def predict(self, samples):
+    def predict_all(self, samples):
         return self.model.predict_all(samples).ravel()
+
+    def predict(self, samples):
+        return np.float32( [self.model.predict(s) for s in samples])
 
 
 def evaluate_model(model, digits, samples, labels):

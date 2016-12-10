@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 from numpy.linalg import norm
-import math
+import math, logging
+
+logging.basicConfig(filename='sudoku_log', level=logging.DEBUG)
 
 def findGrid(thresh):
     kernel = np.array([[0,1,0],[1,1,1],[0,1,0]], dtype=np.uint8)
@@ -474,6 +476,7 @@ def deskew(img):
         return img.copy()
     skew = m['mu11']/m['mu02']
     M = np.float32([[1, skew, -0.5*20*skew], [0, 1, 0]])
+
     img = cv2.warpAffine(img, M, (20, 20), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
     return img
 
@@ -502,6 +505,29 @@ def preprocess_hog(digits):
 def preprocess_simple(digits):
     return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
 
+def filterCells(cells):
+    cc = list()
+    cc_ii = [[None for __ in range(len(cells[0]))] for _ in range(len(cells))]
+
+    x = 4
+    for r, row in enumerate(cells):
+        for c, cell in enumerate(row):
+            if cell is None: continue
+            cell = cell[x:len(cell)-x, x:len(cell[0])-x]
+
+            # verificare se c'e un numero (ciclare sulle diagonali)
+            #kernel = np.ones((3,3),np.uint8)
+            #opening = cv2.morphologyEx(cell, cv2.MORPH_OPEN, kernel)
+
+
+            cell = cv2.resize(cell, (20,20))
+            cv2.imshow("%d %d"%(r,c), cell)
+
+            cc_ii[r][c] = r*9 + c # !!!!!!!!!
+            cc.append(cell)
+    return cc, cc_ii
+
+
 def extractNumbers(cells):
     digits_img = cv2.imread("../images/digits.png", 0)
     h, w = digits_img.shape[:2]
@@ -515,34 +541,30 @@ def extractNumbers(cells):
     digits2 = map(deskew, digits) # "raddrizza" l'immagine, il testo, le cifre
     samples = preprocess_hog(digits2)
 
-    model = cv2.KNearest()
-    model.train(samples, labels)
+    modelsvm = cv2.SVM()
+    params = dict( kernel_type = cv2.SVM_RBF,
+                        svm_type = cv2.SVM_C_SVC,
+                        C = 2.67,
+                        gamma = 5.383 )
+    modelsvm.train(samples, labels, params = params)
 
-    cc = list()
-    cc_ii = [[None for __ in range(len(cells[0]))] for _ in range(len(cells))]
+    modelkn = cv2.KNearest()
+    modelkn.train(samples, labels)
 
-    for r, row in enumerate(cells):
-        for c, cell in enumerate(row):
-            if cell is not None:
-                cc_ii[r][c] = r*9 + c # !!!!!!!!!!
-                #cv2.imshow("%d"%i, cell)
-                cc.append(cell)
+    cc, cc_ii = filterCells(cells)
 
     cells = map(deskew, cc) # "raddrizza" l'immagine, il testo, le cifre
     cells = preprocess_hog(cells)
 
-    retval, results, neigh_resp, dists = model.find_nearest(cells, 4)
+    #cells = np.float32(cc)
+    nn_svm = np.float32( [modelsvm.predict(s) for s in cells])
 
-    nn = results.ravel()
-    print(nn)
-    print(len(nn))
+    retval, results, neigh_resp, dists = modelkn.find_nearest(cells, 4)
+    nn_kn = results.ravel()
+    print(nn_svm)
+    print(nn_kn)
 
-    for r in range(len(cc_ii)):
-        for c in range(len(cc_ii[r])):
-            if cc_ii[r][c] is not None:
-                print("%d %d -> %d"%(r,c,int(nn[cc_ii[r][c]])))
-
-    return nn
+    return nn_svm, nn_kn
 
 def main(image_src, only_m1, show_all, show=False):
     image = cv2.imread(image_src, 0)
@@ -556,7 +578,7 @@ def main(image_src, only_m1, show_all, show=False):
 
     cells = extractCells(points, thresh, kernelTransform)
 
-    nn = extractNumbers(cells)
+    nn_svm, nn_kn = extractNumbers(cells)
 
     # cv2.imshow('source', image)
     # cv2.imshow('gridMask', gridMask)
