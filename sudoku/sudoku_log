@@ -1,0 +1,203 @@
+INFO:root:programm starts at Sun Dec 11 20:03:13 2016
+INFO:root:source img '../images/sudoku2.jpg'
+DEBUG:root:vertical line groups:
+[([1, 2, 3, 4, 5, 6, 7, 8, 9], 54.691441351288944)]
+WARNING:root:point (0, 8) not found
+WARNING:root:point (0, 9) not found
+WARNING:root:point (7, 0) not found
+WARNING:root:point (7, 1) not found
+WARNING:root:point (7, 8) not found
+WARNING:root:point (8, 0) not found
+WARNING:root:point (8, 1) not found
+WARNING:root:point (8, 2) not found
+WARNING:root:point (8, 3) not found
+WARNING:root:point (8, 4) not found
+WARNING:root:point (8, 8) not found
+DEBUG:root:intersection points:
+[[(2, 2), (55, 3), (107, 4), (160, 4), (211, 4), (262, 4), (311, 4), (361, 3), None, None], [(3, 41), (56, 43), (110, 44), (163, 45), (215, 45), (267, 45), (318, 44), (368, 42), (420, 40), (468, 38)], [(3, 85), (58, 87), (113, 88), (168, 88), (221, 88), (274, 88), (326, 87), (377, 85), (427, 84), (476, 82)], [(3, 132), (59, 133), (116, 134), (172, 135), (226, 135), (281, 134), (334, 134), (386, 132), (437, 130), (488, 128)], [(3, 183), (62, 184), (120, 184), (178, 184), (234, 184), (289, 183), (343, 183), (396, 181), (448, 179), (499, 177)], [(4, 235), (63, 236), (124, 235), (183, 235), (240, 234), (297, 233), (352, 232), (406, 230), (459, 228), (511, 226)], [(4, 289), (66, 289), (128, 289), (189, 289), (248, 288), (305, 286), (362, 285), (418, 283), (470, 281), (524, 278)], [None, None, (134, 345), (195, 346), (256, 344), (315, 343), (374, 341), (430, 338), None, (538, 333)], [None, None, None, None, None, (325, 398), (385, 398), (443, 395), None, (553, 389)]]
+INFO:root:training image 'images/digits.png'
+DEBUG:root:number of full cells: 59
+DEBUG:root:Numbers calculated with SVM:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  7.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  7.  8.  4.  2.  7.  9.  8.  7.  7.  6.  5.  5.  0.
+  7.  4.  3.  7.  8.  9.  9.  7.  7.  9.  8.  1.  5.  4.  7.  3.  8.  7.
+  6.  3.  2.  8.  3.]
+DEBUG:root:Numbers calculated with KN:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  3.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  1.  8.  4.  2.  3.  9.  8.  7.  4.  6.  5.  5.  0.
+  0.  4.  3.  9.  8.  9.  7.  8.  7.  9.  6.  1.  5.  4.  8.  3.  8.  7.
+  6.  3.  3.  8.  3.]
+INFO:root:programm starts at Sun Dec 11 20:03:26 2016
+INFO:root:source img '../images/sudoku2.jpg'
+DEBUG:root:vertical line groups:
+[([1, 2, 3, 4, 5, 6, 7, 8, 9], 54.691441351288944)]
+WARNING:root:point (0, 8) not found
+WARNING:root:point (0, 9) not found
+WARNING:root:point (7, 0) not found
+WARNING:root:point (7, 1) not found
+WARNING:root:point (7, 8) not found
+WARNING:root:point (8, 0) not found
+WARNING:root:point (8, 1) not found
+WARNING:root:point (8, 2) not found
+WARNING:root:point (8, 3) not found
+WARNING:root:point (8, 4) not found
+WARNING:root:point (8, 8) not found
+DEBUG:root:intersection points:
+[[(2, 2), (55, 3), (107, 4), (160, 4), (211, 4), (262, 4), (311, 4), (361, 3), None, None], [(3, 41), (56, 43), (110, 44), (163, 45), (215, 45), (267, 45), (318, 44), (368, 42), (420, 40), (468, 38)], [(3, 85), (58, 87), (113, 88), (168, 88), (221, 88), (274, 88), (326, 87), (377, 85), (427, 84), (476, 82)], [(3, 132), (59, 133), (116, 134), (172, 135), (226, 135), (281, 134), (334, 134), (386, 132), (437, 130), (488, 128)], [(3, 183), (62, 184), (120, 184), (178, 184), (234, 184), (289, 183), (343, 183), (396, 181), (448, 179), (499, 177)], [(4, 235), (63, 236), (124, 235), (183, 235), (240, 234), (297, 233), (352, 232), (406, 230), (459, 228), (511, 226)], [(4, 289), (66, 289), (128, 289), (189, 289), (248, 288), (305, 286), (362, 285), (418, 283), (470, 281), (524, 278)], [None, None, (134, 345), (195, 346), (256, 344), (315, 343), (374, 341), (430, 338), None, (538, 333)], [None, None, None, None, None, (325, 398), (385, 398), (443, 395), None, (553, 389)]]
+INFO:root:training image 'images/digits.png'
+DEBUG:root:number of full cells: 59
+DEBUG:root:Numbers calculated with SVM:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  7.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  7.  8.  4.  2.  7.  9.  8.  7.  7.  6.  5.  5.  0.
+  7.  4.  3.  7.  8.  9.  9.  7.  7.  9.  8.  1.  5.  4.  7.  3.  8.  7.
+  6.  3.  2.  8.  3.]
+DEBUG:root:Numbers calculated with KN:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  3.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  1.  8.  4.  2.  3.  9.  8.  7.  4.  6.  5.  5.  0.
+  0.  4.  3.  9.  8.  9.  7.  8.  7.  9.  6.  1.  5.  4.  8.  3.  8.  7.
+  6.  3.  3.  8.  3.]
+INFO:root:programm starts at Sun Dec 11 20:03:33 2016
+INFO:root:source img '../images/sudoku2.jpg'
+DEBUG:root:vertical line groups:
+[([1, 2, 3, 4, 5, 6, 7, 8, 9], 54.691441351288944)]
+WARNING:root:point (0, 8) not found
+WARNING:root:point (0, 9) not found
+WARNING:root:point (7, 0) not found
+WARNING:root:point (7, 1) not found
+WARNING:root:point (7, 8) not found
+WARNING:root:point (8, 0) not found
+WARNING:root:point (8, 1) not found
+WARNING:root:point (8, 2) not found
+WARNING:root:point (8, 3) not found
+WARNING:root:point (8, 4) not found
+WARNING:root:point (8, 8) not found
+DEBUG:root:intersection points:
+[[(2, 2), (55, 3), (107, 4), (160, 4), (211, 4), (262, 4), (311, 4), (361, 3), None, None], [(3, 41), (56, 43), (110, 44), (163, 45), (215, 45), (267, 45), (318, 44), (368, 42), (420, 40), (468, 38)], [(3, 85), (58, 87), (113, 88), (168, 88), (221, 88), (274, 88), (326, 87), (377, 85), (427, 84), (476, 82)], [(3, 132), (59, 133), (116, 134), (172, 135), (226, 135), (281, 134), (334, 134), (386, 132), (437, 130), (488, 128)], [(3, 183), (62, 184), (120, 184), (178, 184), (234, 184), (289, 183), (343, 183), (396, 181), (448, 179), (499, 177)], [(4, 235), (63, 236), (124, 235), (183, 235), (240, 234), (297, 233), (352, 232), (406, 230), (459, 228), (511, 226)], [(4, 289), (66, 289), (128, 289), (189, 289), (248, 288), (305, 286), (362, 285), (418, 283), (470, 281), (524, 278)], [None, None, (134, 345), (195, 346), (256, 344), (315, 343), (374, 341), (430, 338), None, (538, 333)], [None, None, None, None, None, (325, 398), (385, 398), (443, 395), None, (553, 389)]]
+INFO:root:training image 'images/digits.png'
+DEBUG:root:number of full cells: 59
+DEBUG:root:Numbers calculated with SVM:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  7.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  7.  8.  4.  2.  7.  9.  8.  7.  7.  6.  5.  5.  0.
+  7.  4.  3.  7.  8.  9.  9.  7.  7.  9.  8.  1.  5.  4.  7.  3.  8.  7.
+  6.  3.  2.  8.  3.]
+DEBUG:root:Numbers calculated with KN:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  3.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  1.  8.  4.  2.  3.  9.  8.  7.  4.  6.  5.  5.  0.
+  0.  4.  3.  9.  8.  9.  7.  8.  7.  9.  6.  1.  5.  4.  8.  3.  8.  7.
+  6.  3.  3.  8.  3.]
+INFO:root:programm starts at Sun Dec 11 20:04:54 2016
+INFO:root:source img '../images/sudoku2.jpg'
+DEBUG:root:vertical line groups:
+[([1, 2, 3, 4, 5, 6, 7, 8, 9], 54.691441351288944)]
+WARNING:root:point (0, 8) not found
+WARNING:root:point (0, 9) not found
+WARNING:root:point (7, 0) not found
+WARNING:root:point (7, 1) not found
+WARNING:root:point (7, 8) not found
+WARNING:root:point (8, 0) not found
+WARNING:root:point (8, 1) not found
+WARNING:root:point (8, 2) not found
+WARNING:root:point (8, 3) not found
+WARNING:root:point (8, 4) not found
+WARNING:root:point (8, 8) not found
+DEBUG:root:intersection points:
+[[(2, 2), (55, 3), (107, 4), (160, 4), (211, 4), (262, 4), (311, 4), (361, 3), None, None], [(3, 41), (56, 43), (110, 44), (163, 45), (215, 45), (267, 45), (318, 44), (368, 42), (420, 40), (468, 38)], [(3, 85), (58, 87), (113, 88), (168, 88), (221, 88), (274, 88), (326, 87), (377, 85), (427, 84), (476, 82)], [(3, 132), (59, 133), (116, 134), (172, 135), (226, 135), (281, 134), (334, 134), (386, 132), (437, 130), (488, 128)], [(3, 183), (62, 184), (120, 184), (178, 184), (234, 184), (289, 183), (343, 183), (396, 181), (448, 179), (499, 177)], [(4, 235), (63, 236), (124, 235), (183, 235), (240, 234), (297, 233), (352, 232), (406, 230), (459, 228), (511, 226)], [(4, 289), (66, 289), (128, 289), (189, 289), (248, 288), (305, 286), (362, 285), (418, 283), (470, 281), (524, 278)], [None, None, (134, 345), (195, 346), (256, 344), (315, 343), (374, 341), (430, 338), None, (538, 333)], [None, None, None, None, None, (325, 398), (385, 398), (443, 395), None, (553, 389)]]
+INFO:root:training image 'images/digits.png'
+DEBUG:root:number of full cells: 59
+DEBUG:root:Numbers calculated with SVM:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  7.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  7.  8.  4.  2.  7.  9.  8.  7.  7.  6.  5.  5.  0.
+  7.  4.  3.  7.  8.  9.  9.  7.  7.  9.  8.  1.  5.  4.  7.  3.  8.  7.
+  6.  3.  2.  8.  3.]
+DEBUG:root:Numbers calculated with KN:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  3.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  1.  8.  4.  2.  3.  9.  8.  7.  4.  6.  5.  5.  0.
+  0.  4.  3.  9.  8.  9.  7.  8.  7.  9.  6.  1.  5.  4.  8.  3.  8.  7.
+  6.  3.  3.  8.  3.]
+INFO:root:programm starts at Sun Dec 11 20:05:50 2016
+INFO:root:source img '../images/sudoku2.jpg'
+DEBUG:root:vertical line groups:
+[([1, 2, 3, 4, 5, 6, 7, 8, 9], 54.691441351288944)]
+WARNING:root:point (0, 8) not found
+WARNING:root:point (0, 9) not found
+WARNING:root:point (7, 0) not found
+WARNING:root:point (7, 1) not found
+WARNING:root:point (7, 8) not found
+WARNING:root:point (8, 0) not found
+WARNING:root:point (8, 1) not found
+WARNING:root:point (8, 2) not found
+WARNING:root:point (8, 3) not found
+WARNING:root:point (8, 4) not found
+WARNING:root:point (8, 8) not found
+DEBUG:root:intersection points:
+[[(2, 2), (55, 3), (107, 4), (160, 4), (211, 4), (262, 4), (311, 4), (361, 3), None, None], [(3, 41), (56, 43), (110, 44), (163, 45), (215, 45), (267, 45), (318, 44), (368, 42), (420, 40), (468, 38)], [(3, 85), (58, 87), (113, 88), (168, 88), (221, 88), (274, 88), (326, 87), (377, 85), (427, 84), (476, 82)], [(3, 132), (59, 133), (116, 134), (172, 135), (226, 135), (281, 134), (334, 134), (386, 132), (437, 130), (488, 128)], [(3, 183), (62, 184), (120, 184), (178, 184), (234, 184), (289, 183), (343, 183), (396, 181), (448, 179), (499, 177)], [(4, 235), (63, 236), (124, 235), (183, 235), (240, 234), (297, 233), (352, 232), (406, 230), (459, 228), (511, 226)], [(4, 289), (66, 289), (128, 289), (189, 289), (248, 288), (305, 286), (362, 285), (418, 283), (470, 281), (524, 278)], [None, None, (134, 345), (195, 346), (256, 344), (315, 343), (374, 341), (430, 338), None, (538, 333)], [None, None, None, None, None, (325, 398), (385, 398), (443, 395), None, (553, 389)]]
+INFO:root:training image 'images/digits.png'
+DEBUG:root:number of full cells: 59
+DEBUG:root:Numbers calculated with SVM:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  7.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  7.  8.  4.  2.  7.  9.  8.  7.  7.  6.  5.  5.  0.
+  7.  4.  3.  7.  8.  9.  9.  7.  7.  9.  8.  1.  5.  4.  7.  3.  8.  7.
+  6.  3.  2.  8.  3.]
+DEBUG:root:Numbers calculated with KN:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  3.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  1.  8.  4.  2.  3.  9.  8.  7.  4.  6.  5.  5.  0.
+  0.  4.  3.  9.  8.  9.  7.  8.  7.  9.  6.  1.  5.  4.  8.  3.  8.  7.
+  6.  3.  3.  8.  3.]
+INFO:root:programm starts at Sun Dec 11 20:06:40 2016
+INFO:root:source img '../images/sudoku2.jpg'
+DEBUG:root:vertical line groups:
+[([1, 2, 3, 4, 5, 6, 7, 8, 9], 54.691441351288944)]
+WARNING:root:point (0, 8) not found
+WARNING:root:point (0, 9) not found
+WARNING:root:point (7, 0) not found
+WARNING:root:point (7, 1) not found
+WARNING:root:point (7, 8) not found
+WARNING:root:point (8, 0) not found
+WARNING:root:point (8, 1) not found
+WARNING:root:point (8, 2) not found
+WARNING:root:point (8, 3) not found
+WARNING:root:point (8, 4) not found
+WARNING:root:point (8, 8) not found
+DEBUG:root:intersection points:
+[[(2, 2), (55, 3), (107, 4), (160, 4), (211, 4), (262, 4), (311, 4), (361, 3), None, None], [(3, 41), (56, 43), (110, 44), (163, 45), (215, 45), (267, 45), (318, 44), (368, 42), (420, 40), (468, 38)], [(3, 85), (58, 87), (113, 88), (168, 88), (221, 88), (274, 88), (326, 87), (377, 85), (427, 84), (476, 82)], [(3, 132), (59, 133), (116, 134), (172, 135), (226, 135), (281, 134), (334, 134), (386, 132), (437, 130), (488, 128)], [(3, 183), (62, 184), (120, 184), (178, 184), (234, 184), (289, 183), (343, 183), (396, 181), (448, 179), (499, 177)], [(4, 235), (63, 236), (124, 235), (183, 235), (240, 234), (297, 233), (352, 232), (406, 230), (459, 228), (511, 226)], [(4, 289), (66, 289), (128, 289), (189, 289), (248, 288), (305, 286), (362, 285), (418, 283), (470, 281), (524, 278)], [None, None, (134, 345), (195, 346), (256, 344), (315, 343), (374, 341), (430, 338), None, (538, 333)], [None, None, None, None, None, (325, 398), (385, 398), (443, 395), None, (553, 389)]]
+INFO:root:training image 'images/digits.png'
+DEBUG:root:number of full cells: 59
+DEBUG:root:Numbers calculated with SVM:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  7.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  7.  8.  4.  2.  7.  9.  8.  7.  7.  6.  5.  5.  0.
+  7.  4.  3.  7.  8.  9.  9.  7.  7.  9.  8.  1.  5.  4.  7.  3.  8.  7.
+  6.  3.  2.  8.  3.]
+DEBUG:root:Numbers calculated with KN:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  3.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  1.  8.  4.  2.  3.  9.  8.  7.  4.  6.  5.  5.  0.
+  0.  4.  3.  9.  8.  9.  7.  8.  7.  9.  6.  1.  5.  4.  8.  3.  8.  7.
+  6.  3.  3.  8.  3.]
+INFO:root:programm starts at Sun Dec 11 20:38:35 2016
+INFO:root:source img '../images/sudoku2.jpg'
+DEBUG:root:vertical line groups:
+[([1, 2, 3, 4, 5, 6, 7, 8, 9], 54.691441351288944)]
+WARNING:root:point (0, 8) not found
+WARNING:root:point (0, 9) not found
+WARNING:root:point (7, 0) not found
+WARNING:root:point (7, 1) not found
+WARNING:root:point (7, 8) not found
+WARNING:root:point (8, 0) not found
+WARNING:root:point (8, 1) not found
+WARNING:root:point (8, 2) not found
+WARNING:root:point (8, 3) not found
+WARNING:root:point (8, 4) not found
+WARNING:root:point (8, 8) not found
+DEBUG:root:intersection points:
+[[(2, 2), (55, 3), (107, 4), (160, 4), (211, 4), (262, 4), (311, 4), (361, 3), None, None], [(3, 41), (56, 43), (110, 44), (163, 45), (215, 45), (267, 45), (318, 44), (368, 42), (420, 40), (468, 38)], [(3, 85), (58, 87), (113, 88), (168, 88), (221, 88), (274, 88), (326, 87), (377, 85), (427, 84), (476, 82)], [(3, 132), (59, 133), (116, 134), (172, 135), (226, 135), (281, 134), (334, 134), (386, 132), (437, 130), (488, 128)], [(3, 183), (62, 184), (120, 184), (178, 184), (234, 184), (289, 183), (343, 183), (396, 181), (448, 179), (499, 177)], [(4, 235), (63, 236), (124, 235), (183, 235), (240, 234), (297, 233), (352, 232), (406, 230), (459, 228), (511, 226)], [(4, 289), (66, 289), (128, 289), (189, 289), (248, 288), (305, 286), (362, 285), (418, 283), (470, 281), (524, 278)], [None, None, (134, 345), (195, 346), (256, 344), (315, 343), (374, 341), (430, 338), None, (538, 333)], [None, None, None, None, None, (325, 398), (385, 398), (443, 395), None, (553, 389)]]
+INFO:root:training image 'images/digits.png'
+DEBUG:root:number of full cells: 59
+DEBUG:root:Numbers calculated with SVM:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  7.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  7.  8.  4.  2.  7.  9.  8.  7.  7.  6.  5.  5.  0.
+  7.  4.  3.  7.  8.  9.  9.  7.  7.  9.  8.  1.  5.  4.  7.  3.  8.  7.
+  6.  3.  2.  8.  3.]
+DEBUG:root:Numbers calculated with KN:
+[ 6.  1.  5.  8.  4.  9.  7.  3.  8.  3.  3.  5.  1.  9.  4.  6.  2.  9.
+  4.  3.  7.  6.  5.  1.  8.  4.  2.  3.  9.  8.  7.  4.  6.  5.  5.  0.
+  0.  4.  3.  9.  8.  9.  7.  8.  7.  9.  6.  1.  5.  4.  8.  3.  8.  7.
+  6.  3.  3.  8.  3.]

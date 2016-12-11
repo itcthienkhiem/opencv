@@ -1,10 +1,18 @@
 import cv2
 import numpy as np
 from numpy.linalg import norm
-import math, logging
+import math, logging, time
 
 logging.basicConfig(filename='sudoku_log', level=logging.DEBUG)
+logging.info("programm starts at %s"%time.strftime("%c"))
 
+global show_all, interactive_mode, _grid, _pointsImage, _cells
+show_all = False
+interactive_mode = False
+
+#---------------------------------function--------------------------------------
+''' assumiamo per semplicita' che la griglia di gioco sia l'oggetto con area
+    maggiore ed isoliamo tale oggetto '''
 def findGrid(thresh):
     kernel = np.array([[0,1,0],[1,1,1],[0,1,0]], dtype=np.uint8)
     dilate = cv2.dilate(thresh,kernel)
@@ -12,10 +20,9 @@ def findGrid(thresh):
     height, width = dilate.shape[:2]
     mask = np.zeros((height+2, width+2), np.uint8)
 
-    max_dim = max(height, width)
     max_area = -1
     # trovo l'oggetto con area maggiore
-    for i in range(max_dim):
+    for i in range(max(height, width)):
         r = i%height
         c = i%width
         # diagonale discendente
@@ -23,7 +30,7 @@ def findGrid(thresh):
             area, rect = cv2.floodFill(dilate, mask, (c,r), 64)
             if area > max_area:
                 max_area = area
-                point = (c,r)
+                max_area_point = (c,r)
 
         c = width-1-c
         # diagonale ascendente
@@ -31,176 +38,194 @@ def findGrid(thresh):
             area, rect = cv2.floodFill(dilate, mask, (c,r), 64)
             if area > max_area:
                 max_area = area
-                point = (c,r)
+                max_area_point = (c,r)
 
     mask = np.zeros((height+2, width+2), np.uint8)
-    area, rect = cv2.floodFill(dilate, mask, point, 255)
+    area, rect = cv2.floodFill(dilate, mask, max_area_point, 255)
 
     for r in range(height):
         for c in range(width):
+            # elimino cio' che non e' l'oggetto piu' grande
             if dilate[r, c] == 64:
                 cv2.floodFill(dilate, mask, (c,r), 0)
-            if dilate[r, c] == 255:
-                if point[0] == c and point[1] == r:
+            elif dilate[r, c] == 255:
+                if max_area_point[0] == c and max_area_point[1] == r:
                     continue
                 cv2.floodFill(dilate, mask, (c,r), 0)
 
-    return cv2.erode(dilate, kernel)
+    grid = cv2.erode(dilate, kernel)
 
-def mergeLines(lines, width, height):
-    rows = list()
-    cols = list()
-    m_avg = 0
-    nHorizLines = 0
-    for line in lines:
-        if (line[1]!=0): # theta
-            m = -1/math.tan(line[1])
-            c = line[0]/math.sin(line[1])
-            # (0, c) (width, m*width+c)
-            # x,y con origine in alto a sinistra
-            # c = row[0]*(math.sin(row[1]) - m*math.cos(row[1])) # y = mx + q -> q = y - mx
-
-            """
-            Una volta raddrizzata piu o meno la griglia attraverso
-            l approssimazione a un rettangolo posso considerare per le rette
-            orizzontali l intercetta c come valore compreso tra 0 e height
-            e il coefficiente angolare m molto piccolo.
-            Posso invece considerare m molto grande e c molto elevata per le
-            rette verticali. In questo modo elimino rette completamente sbagliate.
-            """
-
-            if m > m_avg-0.3 and m < m_avg+0.3: # rette orizzontali
-                ''' creo dei gruppi secondo l'intercetta c '''
-                groupFind = False
-                for groupRow in rows:
-                    c_avg, group = groupRow
-                    if c < c_avg+height/20 and c > c_avg-height/20: # range in cui varia c
-                        groupFind = True
-                        group.append(line)
-                        groupRow[0] = (c_avg*(len(group)-1)+c)/len(group)
-
-                if not groupFind: rows.append([c, [line]])
-
-                m_avg = (m_avg*nHorizLines+m)/float(nHorizLines+1)
-                nHorizLines += 1
-
-            elif abs(m) > 3: # minima inclinazione della retta verticale
-                zero = -c/m
-                ''' creo dei gruppi secondo l'intersezione con l'asse delle ascisse '''
-                groupFind = False
-                for groupCol in cols:
-                    zero_avg, group = groupCol
-                    if zero < zero_avg+width/20 and zero > zero_avg-width/20: # da stabilire il range valido
-                        groupFind = True
-                        group.append(line)
-                        groupCol[0] = (zero_avg*(len(group)-1)+zero)/len(group)
-
-                if not groupFind: cols.append([zero, [line]])
-
-            else:
-                print('oblique line')
-        else:
-            zero = line[0] # cioe la distanza dall'origine
-            groupFind = False
-            for groupCol in cols:
-                zero_avg, group = groupCol
-                if zero < zero_avg+width/20 and zero > zero_avg-width/20: # da stabilire il range valido
-                    groupFind = True
-                    group.append(line)
-                    groupCol[0] = (zero_avg*(len(group)-1)+zero)/len(group)
-
-            if not groupFind: cols.append([zero, [line]])
-
-    print("rows: %d\ncols: %d"%(len(rows),len(cols)))
-
-    ggRows = list()
-    for c_avg, group in rows:
-        diff = 100
-        bestRow = None
-        for row in group:
-            c = row[0]/math.sin(row[1])
-            if abs(c_avg - c) < diff:
-                diff = abs(c_avg-c)
-                bestRow = row
-        ggRows.append(bestRow)
-
-    ggCols = list()
-    for groupCol in cols:
-        zero_avg, group = groupCol
-
-        diff = 100
-        bestCol = None
-        for col in group:
-            if col[1]!=0:
-                c = col[0]/math.sin(col[1])
-                m = -1/math.tan(col[1])
-                zero = -c/m
-            else:
-                zero = col[0]
-
-            if abs(zero_avg - zero) < diff:
-                diff = abs(zero_avg - zero)
-                bestCol = col
-
-        ggCols.append(bestCol)
-
-    #                                        c                                       zero
-    return sorted(ggRows, key= lambda r: r[0]/math.sin(r[1])), sorted(ggCols, key=calcZero)
-
-def calcZero(line):
-    try:
-        m = -1/math.tan(line[1])
-        c = line[0]/math.sin(line[1])
-        return -c/m
-    except:
-        return line[0]
-
-def method1(image, show_all, show):
-    blur = cv2.GaussianBlur(image,(11,11),0)
-    thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,5,2)
-    if show_all and show: cv2.imshow('threshold1', thresh)
-
-    grid = findGrid(thresh) # find max flood object
-    if show_all and show: cv2.imshow('grid1', grid)
-
-    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) # senza .copy() e meglio?
+    # trovo i contorni e prendo quello maggiore, quello esterno della griglia
+    contours, hierarchy = cv2.findContours(grid.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
     cnt_max = max(contours, key=cv2.contourArea)
-
-    # perimeter = cv2.arcLength(cnt_max, True)
-    # approx = cv2.approxPolyDP(cnt_max, 0.04 * perimeter, True) # trovo approssimati punti del rettangolo
-
-    # for point in approx:
-    #     point = point[0]
-    #     cv2.circle(canvas, (point[0],point[1]),   8, 255, -1)
-
-
-    # corners = cv2.goodFeaturesToTrack(canvas,4,0.1,10)
-    # corners = np.int0(corners)
-    #
-    # for i in corners:
-    #     x,y = i.ravel()
-    #     cv2.circle(canvas,(x,y),5,255,-1)
-
     rect = cv2.minAreaRect(cnt_max) # (centrox, centroy), (w,h), angolo
     box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-    box = np.int0(box)
-    # cv2.drawContours(canvas,[box],0,64,2)
+    kernelTransform = np.int0(box)
 
-    grid = four_point_transform(grid, box) # prendo e raddrizzo la porzione dell'immagine da elaborare
+    # creo una maschera per isolare dall'immagine originale solo la griglia
+    # disegno il contorno esterno della griglia e lo riempio, poi procedo con un
+    # and bit-a-bit sul threshold dell'immagine originale
+    height, width = thresh.shape[:2]
+    gridMask = np.zeros((height, width), np.uint8)
+    cv2.drawContours(gridMask, cnt_max, -1, 255, thickness=cv2.cv.CV_FILLED) # CV_FILLED non funziona
+    mask = np.zeros((height+2, width+2), np.uint8)
 
-    lines = cv2.HoughLines(grid,1,np.pi/180,200)
-    grid2 = grid.copy()
-    drawLines(lines[0], grid2)
-    if show_all: cv2.imshow('all lines', grid2)
+    tl, tr, br, bl = order_points(kernelTransform)
+    cv2.floodFill(gridMask, mask, (int(br[0]+tl[0])/2, int(br[1]+tl[1])/2), 255)
+    threshROI = cv2.bitwise_and(thresh, gridMask)
 
-    rr, cc = mergeLines(lines[0], *grid.shape[:2])
-    drawLines(rr+cc, grid)
-    cv2.imshow('grid', grid)
+    return threshROI, kernelTransform, cnt_max
 
-    return thresh, grid, rr, cc, box, cnt_max
+#---------------------------------function--------------------------------------
+''' applica una trasformazione all'immagine per "raddrizzare" la griglia:
+    se la griglia si trova completamente nell'immagine applica una trasformazione
+    attraverso il punti estremi del contorno; altrimenti la applica secondo i
+    vertici del rettangolo che contiene la griglia '''
+def adaptGrid(grid, kernelTransform, cnt_max):
+    height, width = grid.shape[:2]
+    for point in kernelTransform:
+        if  point[0]<0 or point[0]>=width or \
+            point[1]<0 or point[1]>=height:
+            # la griglia va fuori dall'immagine
+            return four_point_transform(grid, kernelTransform), kernelTransform
 
+    # la griglia sta tutta nell'immagine
+    pp = map(lambda p: p[0], cnt_max)
+    kernelTransform = order_points(np.int0(pp))
+    return four_point_transform(grid, kernelTransform), kernelTransform
 
-def calcDistMiddlePoint(segment1, segment2):
+#---------------------------------function--------------------------------------
+''' trova le linee orizzontali che piu' si addicono ad essere le linee delle
+    righe '''
+def getRows(gridTransformed):
+    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,1))
+    gridClosed = cv2.morphologyEx(gridTransformed, cv2.MORPH_CLOSE, expandeKernel) # piu iterazioni se immagine distorta
+    # horizontal = cv2.dilate(gridTransformed, expandeKernel) # espando un po' le linee orizzontali
+    # horizontal = cv2.erode(gridTransformed, expandeKernel)
+
+    # horizontalsize = 20 # gridTransformed.shape[1] / 30
+    horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (20,1))
+    horizontal = cv2.erode(gridClosed, horizontalStructure)
+    horizontal = cv2.dilate(horizontal, horizontalStructure)
+    if show_all: cv2.imshow("horizontal", horizontal)
+
+    cntHorizLines, hierarchy = cv2.findContours(horizontal, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
+    rows = list()
+    for cnt in cntHorizLines:
+        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
+        box = np.int0(cv2.cv.BoxPoints(rect)) # ottengo vertici rettangolo
+        tl, tr, br, bl = order_points(box)
+        if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4 and
+          ((bl[0]-br[0])**2+(bl[1]-br[1])**2)/((tl[0]-bl[0])**2+(tl[1]-bl[1])**2) > 500): # rapporto lunghezza/altezza linea verticale:
+            rows.append({"points":(tl, tr, br, bl), "cnt":cnt})
+
+    rows = map( lambda r: r["cnt"],
+                # ordinamento in base alla distanza verticale
+                sorted(rows, key=lambda r: r["points"][0][1]))
+
+    return rows
+
+#---------------------------------function--------------------------------------
+''' trova le linee verticali che piu' si addicono ad essere le linee delle
+    colonne '''
+def getCols(gridTransformed):
+    # si applica tale trasformazione per eliminare parte dei pixel neri che non
+    # permettono la continuazione della linea
+    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,5))
+    gridClose = cv2.morphologyEx(gridTransformed, cv2.MORPH_CLOSE, expandeKernel)
+
+    # kernel per isolare le linee verticali
+    verticalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (1,20))
+    vertical = cv2.erode(gridClose, verticalStructure)
+    vertical = cv2.dilate(vertical, verticalStructure)
+    if show_all: cv2.imshow('vertical', vertical)
+
+    cntVertLines, hierarchy = cv2.findContours(vertical.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+
+    verticalLines = list()
+    # filtro le linee secondo una lunghezza minima
+    for cnt in cntVertLines:
+        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
+        box = np.int0(cv2.cv.BoxPoints(rect)) # ottengo vertici rettangolo
+        tl, tr, br, bl = order_points(box)
+
+        if (abs(tl[1]-bl[1]) > vertical.shape[0]//4 and # lunghezza minima
+            # rapporto altezza/larghezza linea verticale
+          ((tl[0]-bl[0])**2+(tl[1]-bl[1])**2)/((bl[0]-br[0])**2+(bl[1]-br[1])**2) > 500):
+            # salvo i vertici del rettangolo che descrive il contorno
+            verticalLines.append({"points":(tl, tr, br, bl), "cnt":cnt})
+
+    # ordinamento in base alla distanza rispetto all'asse delle ordinate
+    verticalLines = sorted(verticalLines, key=lambda l: l["points"][0][0])
+
+    distances = list()
+    tl_prec, bl_prec = verticalLines[0]["points"][0], verticalLines[0]["points"][3]
+    # calcolo le distanze tra le linee successive
+    for i, line in enumerate(verticalLines[1:]):
+        tl, tr, br, bl = line["points"]
+        dist = calcDist((tl, bl),(tl_prec, bl_prec))
+        distances.append((1+i, dist)) # (indice linea attuale, distanza dalla precedente)
+        tl_prec, bl_prec = tl, bl
+
+    DELTA_DIST = vertical.shape[1]/80.0 # massima differenza tra 2 distanze
+    groups = list()
+    lines_checked = list() # linee gia aggiunte
+
+    # aggrego le linee in gruppi in base alla similitudine della loro distanza
+    # (non sapendo la distanza tra ogni riga della colonna, creo dei gruppi e
+    # osservo quale gruppo ha piu' linee con distanza simile, assumendo che
+    # esse siano le linee delle colonne; trovo quindi la distanza media)
+    for i, (pos_line1, dist) in enumerate(distances):
+        if pos_line1 in lines_checked: continue
+        group = [pos_line1]
+        lines_checked.append(pos_line1)
+        distTot = dist
+
+        for pos_line2, dist2 in distances[i+1:]:
+            if pos_line2 in lines_checked: continue
+
+            if abs(dist-dist2) < DELTA_DIST: # distanza2 simile a distanza1
+                distTot += dist2
+                group.append(pos_line2)
+                lines_checked.append(pos_line2)
+
+        groups.append((group, float(distTot)/len(group)))
+
+    logging.debug("vertical line groups:\n"+str(groups))
+
+    bestGroup = max(groups, key=lambda g: len(g[0])) # miglior gruppo
+    distAvg = bestGroup[1] # distanza media
+
+    # trovo le linee verticali mancanti (quando si eseguono le trasformazioni
+    # vengono trovate linee incorrette, create dall'unione verticale dei px
+    # delle cifre; con il procedimento dei gruppi si nota che la distanza tra
+    # 2 linee consecutive non e' corretta; aggiungo quindi la linea mancante
+    # che descrive la colonna)
+    bugs = list()
+    for i, pos_line in enumerate(bestGroup[0][:-1]):
+        pos_next_line = bestGroup[0][i+1]
+        if pos_next_line - pos_line == 1: continue # linee consecutive
+
+        for pos_bug_line,_ in distances[pos_line:pos_next_line-1]:
+            tl1, _, _, bl1 = verticalLines[pos_bug_line]["points"]
+            tl2, _, _, bl2 = verticalLines[pos_line]["points"]
+
+            if distAvg-DELTA_DIST < calcDist((tl1, bl1),(tl2, bl2)) < distAvg+DELTA_DIST:
+                bugs.append(pos_bug_line)
+                pos_line = pos_bug_line
+
+    # [bestGroup[0][0]-1] e' la posizione della prima colonna nella lista 'verticalLines'
+    # con map prendo solo i contorni
+    cols = map( lambda pos_line: verticalLines[pos_line]["cnt"],
+                # ordinamento in base alla distanza rispetto all'asse delle ordinate
+                sorted(bestGroup[0]+bugs+[bestGroup[0][0]-1], key=lambda pos_line: verticalLines[pos_line]["points"][0][0]))
+    return cols
+
+#---------------------------------function--------------------------------------
+''' calcola la distanza tra 2 segmenti, attraverso la perpendicolare per il
+    punto medio del primo segmento '''
+def calcDist(segment1, segment2):
     p1, p2 = segment1
     p3, p4 = segment2
 
@@ -213,11 +238,13 @@ def calcDistMiddlePoint(segment1, segment2):
         # distanza punto retta
         dist = abs(middlePoint[1] - (m2*middlePoint[0] + q2)) / math.sqrt(1+m2**2)
     else:
-        # retta verticale
+        # distanza punto retta verticale
         dist = abs(p3[0]-middlePoint[0])
 
     return dist
 
+#---------------------------------function--------------------------------------
+''' calcola il punto medio dei punti di intersezione tra riga e colonna '''
 def getIntersectionPoint(intersection):
     contours,_ = cv2.findContours(intersection,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     if not contours: return None
@@ -233,142 +260,22 @@ def getIntersectionPoint(intersection):
 
     return (x_avg, y_avg)
 
-def method2(image, cnt_max, kernelTransform, show_all, show):
+#---------------------------------function--------------------------------------
+''' trova i punti di intersezione tra righe e colonne '''
+def findPoints(image):
     blur = cv2.GaussianBlur(image,(9,9),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,7,2)
-    if show_all: cv2.imshow('threshold2', thresh)
+    if show_all: cv2.imshow('threshold', thresh)
 
-    height, width = thresh.shape[:2]
-    gridMask = np.zeros((height, width), np.uint8)
-    cv2.drawContours(gridMask, cnt_max, -1, 255, thickness=cv2.cv.CV_FILLED) # ???? perche non lo riempie??
-    mask = np.zeros((height+2, width+2), np.uint8)
+    _grid, kernelTransform, cnt_max = findGrid(thresh)
 
-    tl, tr, br, bl = order_points(kernelTransform)
-    cv2.floodFill(gridMask, mask, (int(br[0]+tl[0])/2, int(br[1]+tl[1])/2), 255) # !!!!!!!!!!! riempire tutto il contorno
+    gridTransformed, kernelTransform = adaptGrid(_grid, kernelTransform, cnt_max)
+    if show_all: cv2.imshow('gridTransformed', gridTransformed)
 
-    threshROI = cv2.bitwise_and(thresh, gridMask)
-    threshROIAdapted = four_point_transform(threshROI, kernelTransform)
-    if show_all: cv2.imshow('ROItransformed', threshROIAdapted)
+    rows = getRows(gridTransformed)
+    cols = getCols(gridTransformed)
 
-
-    horizontalsize = 20 # threshROIAdapted.shape[1] / 30
-    horizontalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (horizontalsize,1))
-
-    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,1))
-    horizontal = cv2.morphologyEx(threshROIAdapted, cv2.MORPH_CLOSE, expandeKernel, iterations=1) # piu iterazioni se immagine distorta
-    # horizontal = cv2.dilate(threshROIAdapted, expandeKernel) # espando un po' le linee orizzontali
-    # horizontal = cv2.erode(threshROIAdapted, expandeKernel)
-
-    horizontal = cv2.erode(horizontal, horizontalStructure)
-    horizontal = cv2.dilate(horizontal, horizontalStructure)
-
-    contours, hierarchy = cv2.findContours(horizontal.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
-
-    rows = list()
-    for cnt in contours:
-        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
-        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-        box = np.int0(box)
-        tl, tr, br, bl = order_points(box)
-        if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4):
-            rows.append((tl, tr, br, bl, cnt))
-            # cv2.drawContours(h2, cnt, -1, 255, thickness=-1)
-    rows = map( lambda r: r[-1],
-                sorted(rows, key=lambda r: r[0][1])
-              )
-
-    # cv2.imshow('horizontal', horizontal)
-
-    # lines = cv2.HoughLines(horizontal,1,np.pi/180,200)
-    # rr, cc = mergeLines(lines[0], *horizontal.shape[:2])
-    # drawLines(rr, gridMask)
-
-    verticalsize = 20 # threshROIAdapted.shape[0] / 30
-    verticalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (1,verticalsize))
-    # verticalStructure = np.array([[0,0,1,0,0]]*5+[[0,1,1,1,0]]*5+[[1,1,0,1,1]]*5, np.uint8)
-
-    expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,5))
-    vertical = cv2.morphologyEx(threshROIAdapted, cv2.MORPH_CLOSE, expandeKernel, iterations=1)
-
-    vertical = cv2.erode(vertical, verticalStructure)
-    vertical = cv2.dilate(vertical, verticalStructure)
-
-    # cv2.imshow('vertical', vertical)
-
-
-    contours, hierarchy = cv2.findContours(vertical.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
-
-    verticalLines = list()
-    for cnt in contours:
-        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
-        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-        box = np.int0(box)
-
-        tl, tr, br, bl = order_points(box)
-        if (abs(tl[1]-bl[1]) > vertical.shape[0]//4 and ((tl[0]-bl[0])**2+(tl[1]-bl[1])**2)/((bl[0]-br[0])**2+(bl[1]-br[1])**2) > 500):
-            verticalLines.append([tl, tr, br, bl, cnt])
-
-
-    verticalLines = sorted(verticalLines, key=lambda l: l[0][0])
-
-    tl_prec, bl_prec = verticalLines[0][0], verticalLines[0][3]
-    verticalDistances = list()
-    for i, (tl, tr, br, bl, cnt) in enumerate(verticalLines[1:]):
-        dist = calcDistMiddlePoint((tl, bl),(tl_prec, bl_prec))
-        verticalDistances.append((1+i, dist))
-        tl_prec, bl_prec = tl, bl
-
-    # verticalDistances = sorted(verticalDistances, key=lambda dist: dist[1])
-    print(verticalDistances)
-
-    RANGE_DIST = vertical.shape[1]/80.0
-    groups = list()
-    temp = list()
-    for i, dist in verticalDistances:
-        if i in temp: continue
-        group = [i]
-        temp.append(i)
-        distTot = dist
-        for i2, dist2 in verticalDistances:
-            if i==i2 or i2 in temp: continue
-
-            if abs(dist-dist2) < RANGE_DIST:
-                distTot += dist2
-                group.append(i2)
-                temp.append(i2)
-        groups.append([group, float(distTot)/len(group)])
-
-    print(groups)
-
-    bestGroup = max(groups, key=lambda g: len(g[0]))
-    distAvg = bestGroup[1]
-
-    bugs = list()
-    for i, i_cnt in enumerate(bestGroup[0][:-1]):
-        i_cntNext = bestGroup[0][i+1]
-        if i_cntNext - i_cnt == 1: continue
-
-        for i, dist in verticalDistances[i_cnt:i_cntNext]:
-            if distAvg-RANGE_DIST < calcDistanceIndexCnt(i, i_cnt, verticalLines) < distAvg+RANGE_DIST:
-                bugs.append(i)
-                i_cnt = i
-
-
-    cols = list()
-    for i_cnt in bestGroup[0]+bugs+[0]: # assumiamo che la prima riga sia effettivamente la prima !!! da sistemare
-        cnt = verticalLines[i_cnt][-1]
-
-        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
-        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-        box = np.int0(box)
-        tl, tr, br, bl = order_points(box)
-        cols.append((tl, tr, br, bl, cnt))
-        # cv2.drawContours(v2, cnt, -1, 255, thickness=-1)
-    cols = map( lambda c: c[-1],
-                sorted(cols, key=lambda c: c[0][0])
-              )
-
-    height, width = threshROIAdapted.shape[:2]
+    height, width = gridTransformed.shape[:2]
     points = [[None for __ in range(len(cols))] for _ in range(len(rows))]
     canvas = np.zeros((height, width), np.uint8)
 
@@ -380,33 +287,33 @@ def method2(image, cnt_max, kernelTransform, show_all, show):
             col_canvas = canvas.copy()
             cv2.drawContours(col_canvas, cnt_c, -1, 255, thickness=1)
 
-            intersection = cv2.bitwise_and(row_canvas, col_canvas)
+            # and bit-a-bit tra il contorno della riga e quello della colonna
+            # dara' fino a 4 punti di intersezione dato che il contorno e' vuoto
+            # (non sono riuscito a riempirlo con la funzione ufficiale)
+            intersections = cv2.bitwise_and(row_canvas, col_canvas)
 
-            # ottengo il centro
-            point = getIntersectionPoint(intersection)
-            if point == None: print("Error: %d %d"%(i_r, i_c))
+            # ottengo il centro dei punti di intersezione, che potrebbe non
+            # esserci se l'intersezione riga-colonna non avviene
+            # (per esempio quando manca parte dell'immagine)
+            point = getIntersectionPoint(intersections)
+
+            if point is None:
+                logging.warning("point (%d, %d) not found"%(i_r, i_c))
             points[i_r][i_c] = point
 
+    # crea l'immagine con tutti i punti di intersezione
     pp_canvas = canvas.copy()
     for row_points in points:
         for p in row_points:
-            cv2.circle(pp_canvas, p,   0, 255, -1)
-        cv2.imshow("points", pp_canvas)
-        # cv2.waitKey(1000)
-    return points, pp_canvas
+            if p is not None: cv2.circle(pp_canvas, p,   0, 255, -1)
 
+    if interactive_mode: cv2.imshow("points", pp_canvas)
 
-def drawLines(lines, image, color=64):
-    for line in lines:
-        if (line[1]!=0):
-            m = -1/math.tan(line[1])
-            c = line[0]/math.sin(line[1])
-            # print("%d %d"%(0,int(c)))
-            # print("%d %d"%(image.shape[1],int(m*image.shape[1]+c)))
-            cv2.line(image,(0,int(c)),(image.shape[1],int(m*image.shape[1]+c)),color,1)
-        else:
-            cv2.line(image,(int(line[0]),0),(int(line[0]),image.shape[0]),color,1)
+    return points, pp_canvas, kernelTransform
 
+#---------------------------------function--------------------------------------
+''' trova gli "estremi" di un insieme di punti, gli restituisce poi secondo
+    l'ordine: top-left(tl), top-right(tr), bottom-right(br), bottom-left(bl) '''
 def order_points(pts):
 	rect = np.zeros((4, 2), dtype = "float32")
 
@@ -426,6 +333,8 @@ def order_points(pts):
 	# return the ordered coordinates
 	return rect
 
+#---------------------------------function--------------------------------------
+''' dati almeno 4 punti, trova gli estremi e "raddrizza" l'immagine in base ad essi '''
 def four_point_transform(image, pts):
 	rect = order_points(pts)
 	(tl, tr, br, bl) = rect
@@ -451,25 +360,31 @@ def four_point_transform(image, pts):
 
 	return warped
 
-
-def extractCells(points, thresh, kernelTransform):
+#---------------------------------function--------------------------------------
+''' dati i vertici delle singole celle, estrae dall'immagine ogni cella e la
+    "raddrizza" '''
+def extractCells(points, image, kernelTransform):
+    blur = cv2.GaussianBlur(image,(11,11),0)
+    thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,5,2)
     threshAdapted = four_point_transform(thresh, kernelTransform)
+    cv2.imshow("thresh2 transformed", threshAdapted)
 
-    gridImages = [[None for __ in range(len(points[0]))] for _ in range(len(points))]
+    cellsImage = [[None for __ in range(len(points[0])-1)] for _ in range(len(points)-1)]
 
     for r, row_points in enumerate(points[:-1]):
         for c, point1 in enumerate(row_points[:-1]):
-            point2 = points[r+1][c]
-            point3 = points[r][c+1]
-            point4 = points[r+1][c+1]
-            if point1 and point2 and point3 and point4:
+            point2 = points[r][c+1]
+            point3 = points[r+1][c+1]
+            point4 = points[r+1][c]
+            if point1 is not None and point2 is not None and point3 is not None and point4 is not None:
                 cell = np.int0((point1, point2, point3, point4))
                 imgCell = four_point_transform(threshAdapted, cell)
-                gridImages[r][c] = imgCell
-                # cv2.imshow("%d,%d"%(r,c), imgCell)
+                cellsImage[r][c] = imgCell
 
-    return gridImages
+    return cellsImage
 
+#---------------------------------function--------------------------------------
+''' "raddrizza" l'immagine '''
 def deskew(img):
     m = cv2.moments(img)
     if abs(m['mu02']) < 1e-2:
@@ -480,6 +395,7 @@ def deskew(img):
     img = cv2.warpAffine(img, M, (20, 20), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
     return img
 
+#---------------------------------function--------------------------------------
 def preprocess_hog(digits):
     samples = []
     for img in digits:
@@ -502,105 +418,154 @@ def preprocess_hog(digits):
         samples.append(hist)
     return np.float32(samples)
 
-def preprocess_simple(digits):
-    return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
-
+#---------------------------------function--------------------------------------
+''' elimina il bordo esterno, riduce la cella ad una dimensione che combaci con
+    la dimensione delle cifre del training, elimina le celle vuote '''
 def filterCells(cells):
-    cc = list()
-    cc_ii = [[None for __ in range(len(cells[0]))] for _ in range(len(cells))]
+    cc = [[None for __ in range(len(cells[0]))] for _ in range(len(cells))]
+    goodCells = list()
 
-    x = 4
+    ext_dim = 4 # numero px da togliere ai bordi
     for r, row in enumerate(cells):
         for c, cell in enumerate(row):
             if cell is None: continue
-            cell = cell[x:len(cell)-x, x:len(cell[0])-x]
-
-            # verificare se c'e un numero (ciclare sulle diagonali)
-            #kernel = np.ones((3,3),np.uint8)
-            #opening = cv2.morphologyEx(cell, cv2.MORPH_OPEN, kernel)
-
-
+            cell = cell[ext_dim:len(cell)-ext_dim, ext_dim:len(cell[0])-ext_dim]
             cell = cv2.resize(cell, (20,20))
-            cv2.imshow("%d %d"%(r,c), cell)
 
-            cc_ii[r][c] = r*9 + c # !!!!!!!!!
-            cc.append(cell)
-    return cc, cc_ii
+            # controllo se la cella e' vuota
+            px_found = 0
+            for i in range(20):
+                if cell[i][i]:
+                    px_found += 1
+                if cell[19-i][i]:
+                    px_found += 1
+                if px_found > 4:
+                    break
 
+            if px_found > 4:
+                cc[r][c] = cell
+                goodCells.append(cell)
+                if show_all: cv2.imshow("%d %d"%(r,c), cell)
 
-def extractNumbers(cells):
-    digits_img = cv2.imread("../images/digits.png", 0)
+    logging.debug("number of full cells: %d"%len(goodCells))
+
+    return cc, goodCells
+
+#---------------------------------function--------------------------------------
+''' applica i methodi SVM e KN sulle celle non vuote, per trovare quale
+    cifra e' presente in ogni cella '''
+def extractNumbers(cells, train_img ="images/digits.png"):
+    # training ----------------------------------------------
+    logging.info("training image '%s'"%train_img)
+
+    digits_img = cv2.imread(train_img, 0)
     h, w = digits_img.shape[:2]
-    sx, sy = (20, 20) # cell dimensions
+    sx, sy = (20, 20)
     digits = [np.hsplit(row, w//sx) for row in np.vsplit(digits_img, h//sy)]
     digits = np.array(digits)
-    digits = digits.reshape(-1, sy, sx) # raggruppo righe
+    digits = digits.reshape(-1, sy, sx)
 
-    labels = np.repeat(np.arange(10), len(digits)/10) # 10 number of images for the same digit
+    labels = np.repeat(np.arange(10), len(digits)/10)
 
-    digits2 = map(deskew, digits) # "raddrizza" l'immagine, il testo, le cifre
+    digits2 = map(deskew, digits)
     samples = preprocess_hog(digits2)
 
     modelsvm = cv2.SVM()
-    params = dict( kernel_type = cv2.SVM_RBF,
-                        svm_type = cv2.SVM_C_SVC,
-                        C = 2.67,
-                        gamma = 5.383 )
+    params = dict(  kernel_type = cv2.SVM_RBF,
+                    svm_type = cv2.SVM_C_SVC,
+                    C = 2.67,
+                    gamma = 5.383 )
     modelsvm.train(samples, labels, params = params)
 
     modelkn = cv2.KNearest()
     modelkn.train(samples, labels)
 
-    cc, cc_ii = filterCells(cells)
-
-    cells = map(deskew, cc) # "raddrizza" l'immagine, il testo, le cifre
+    # process cells -----------------------------------------
+    cc, goodCells = filterCells(cells)
+    cells = map(deskew, goodCells)
     cells = preprocess_hog(cells)
 
-    #cells = np.float32(cc)
     nn_svm = np.float32( [modelsvm.predict(s) for s in cells])
 
     retval, results, neigh_resp, dists = modelkn.find_nearest(cells, 4)
     nn_kn = results.ravel()
-    print(nn_svm)
-    print(nn_kn)
 
-    return nn_svm, nn_kn
+    return nn_svm, nn_kn, cc
 
-def main(image_src, only_m1, show_all, show=False):
-    image = cv2.imread(image_src, 0)
+#---------------------------------function--------------------------------------
+''' crea e mostra un'immagine contenente le cifre trovate, posizionate secondo
+    la loro posizione nell'immagine di origine '''
+def drawDigits(nn_svm, nn_kn, cc):
+    L = 50
+    svmNumbers = np.zeros((L*len(cc),L*len(cc[0])), np.uint8)
+    knNumbers = np.zeros((L*len(cc),L*len(cc[0])), np.uint8)
 
-    thresh, grid, rr, cc, kernelTransform, cnt_max = method1(image, show_all, show)
-    points, pointsImage = method2(image, cnt_max, kernelTransform, show_all, show)
+    i = 0
+    for r, rowCell in enumerate(cc):
+        for c, cell in enumerate(rowCell):
+            if cell is None: continue
 
-    # intrecciare dati
+            cv2.putText(svmNumbers, str(int(nn_svm[i])), (c*L+L/2, r*L+L/2), cv2.FONT_HERSHEY_SIMPLEX, 1, 255)
+            cv2.putText(knNumbers, str(int(nn_kn[i])), (c*L+L/2, r*L+L/2), cv2.FONT_HERSHEY_SIMPLEX, 1, 255)
+            i += 1
 
-    cells = extractCells(points, thresh, kernelTransform)
+    cv2.imshow("svmNumbers", svmNumbers)
+    cv2.imshow("knNumbers", knNumbers)
 
-    nn_svm, nn_kn = extractNumbers(cells)
+#---------------------------------function--------------------------------------
+''' avvia l'algoritmo per trovare i numeri posizionati all'interno di una griglia '''
+def getNumbers(img_path):
+    logging.info("source img '%s'"%img_path)
 
-    # cv2.imshow('source', image)
-    # cv2.imshow('gridMask', gridMask)
-    # cv2.imshow('grid', grid)
+    try:
+        image = cv2.imread(img_path, 0)
+        if interactive_mode: cv2.imshow("source image", image)
+
+        points, _pointsImage, kernelTransform = findPoints(image)
+        logging.debug("intersection points:\n"+str(points))
+
+        _cells = extractCells(points, image, kernelTransform)
+        nn_svm, nn_kn, goodCells = extractNumbers(_cells)
+
+        logging.debug("Numbers calculated with SVM:\n"+str(nn_svm))
+        logging.debug("Numbers calculated with KN:\n"+str(nn_kn))
+
+        if interactive_mode: drawDigits(nn_svm, nn_kn, goodCells)
+
+    except Exception, e:
+        import sys
+        logging.critical(str(e))
+        sys.exit(1)
+
+    return nn_kn
+
+#---------------------------------function--------------------------------------
+''' salva le immagini risultanti dal procedimento '''
+def saveData(image_src, base_dir="output"):
+    import os
+    folder_name = image_src.split('/')[-1].split('.')[0]
+    folder_path = "%s/%s"%(base_dir, folder_name)
+    if not os.path.exists(folder_path): os.mkdir(folder_path)
+
+    cv2.imwrite(folder_path+'/grid.png',_grid)
+    cv2.imwrite(folder_path+'/points.png',_pointsImage)
+
+    cells_path = folder_path+'/cells'
+    if not os.path.exists(folder_path): os.mkdir(cells_path)
+
+    for r in range(len(_cells)):
+        for c in range(len(_cells[0])):
+            cell = _cells[r][c]
+            if cell is None: continue
+            cv2.imwrite(cells_path+'/%d_%d.png'%(r,c),cell)
+
+def main(image_src):
+    nn = getNumbers(image_src)
 
     while 1:
         k = cv2.waitKey(0) & 0xFF
         if k == ord('s'):
-            import os
-            folder_name = image_src.split('/')[-1].split('.')[0]
-            folder_path = "output/"+folder_name
-            if not os.path.exists(folder_path):
-                os.mkdir(folder_path)
-
-            cv2.imwrite(folder_path+'/grid.png',grid)
-            cv2.imwrite(folder_path+'/points.png',pointsImage)
-
-            cells_path = folder_path+'/cells'
-            os.mkdir(cells_path)
-            for r in range(len(cells)):
-                for c in range(len(cells[0])):
-                    cell = cells[r][c]
-                    if cell is None: continue
-                    cv2.imwrite(cells_path+'/%d_%d.png'%(r,c),cell)
+            saveData(image_src)
             break
         elif k == 27:
             break
@@ -608,15 +573,14 @@ def main(image_src, only_m1, show_all, show=False):
 
 
 if __name__ == '__main__':
-    import sys
     import argparse
 
     parser = argparse.ArgumentParser(description='OpenCV. Recognise a grid and extract data cells.')
-
-    parser.add_argument('img', metavar='img', nargs='?', default="../images/sudoku.jpg", help='image path')
-    parser.add_argument('-a', '--show_all', dest="show_all", nargs='?', const=True, default=False, help='show all result images')
-    parser.add_argument('-m1', '--method1', dest="only_m1", nargs='?', const=True, default=False, help='execute only method 1')
-
+    parser.add_argument('img', metavar='img', nargs='?', default="../images/sudoku.jpg", help='image path (current working directory is images)')
+    parser.add_argument('--show_all', dest="show_all", nargs='?', const=True, default=False, help='show all images')
     args = parser.parse_args()
 
-    main("../images/%s"%args.img, args.only_m1, args.show_all, show=True)
+    interactive_mode = True
+    show_all = args.show_all
+
+    main("../images/%s"%args.img)
