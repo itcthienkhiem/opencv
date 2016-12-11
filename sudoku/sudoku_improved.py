@@ -65,7 +65,7 @@ def findGrid(thresh):
     return threshROI, kernelTransform, cnt_max
 
 def adaptGrid(grid, kernelTransform, cnt_max):
-    return four_point_transform(grid, kernelTransform)
+    # return four_point_transform(grid, kernelTransform), kernelTransform
 
     # !!!!!!!!!!!
     height, width = grid.shape[:2]
@@ -73,12 +73,12 @@ def adaptGrid(grid, kernelTransform, cnt_max):
         if  point[0]<0 or point[0]>=width or \
             point[1]<0 or point[1]>=height:
             # la griglia va fuori dall'immagine
-            return four_point_transform(grid, kernelTransform)
+            return four_point_transform(grid, kernelTransform), kernelTransform
 
     # la griglia sta tutta nell'immagine
     pp = map(lambda p: p[0], cnt_max)
     kernelTransform = order_points(np.int0(pp))
-    return four_point_transform(grid, kernelTransform)
+    return four_point_transform(grid, kernelTransform), kernelTransform
 
 def getRows(gridTransformed):
     expandeKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,1))
@@ -99,11 +99,14 @@ def getRows(gridTransformed):
         rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
         box = np.int0(cv2.cv.BoxPoints(rect)) # ottengo vertici rettangolo
         tl, tr, br, bl = order_points(box)
-        if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4):
+        if (abs(tr[0]-tl[0]) > horizontal.shape[1]//4 and
+          ((bl[0]-br[0])**2+(bl[1]-br[1])**2)/((tl[0]-bl[0])**2+(tl[1]-bl[1])**2) > 500): # rapporto lunghezza/altezza linea verticale:
             rows.append({"points":(tl, tr, br, bl), "cnt":cnt})
 
     rows = map( lambda r: r["cnt"],
+                # ordinamento in base alla distanza verticale
                 sorted(rows, key=lambda r: r["points"][0][1]))
+
     return rows
 
 def getCols(gridTransformed):
@@ -115,81 +118,77 @@ def getCols(gridTransformed):
     vertical = cv2.dilate(vertical, verticalStructure)
     if show_all: cv2.imshow('vertical', vertical)
 
-
     cntVertLines, hierarchy = cv2.findContours(vertical.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 
     verticalLines = list()
+    # filtro le linee di una lunghezza minima
     for cnt in cntVertLines:
         rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
-        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-        box = np.int0(box)
-
+        box = np.int0(cv2.cv.BoxPoints(rect)) # ottengo vertici rettangolo
         tl, tr, br, bl = order_points(box)
-        if (abs(tl[1]-bl[1]) > vertical.shape[0]//4 and ((tl[0]-bl[0])**2+(tl[1]-bl[1])**2)/((bl[0]-br[0])**2+(bl[1]-br[1])**2) > 500):
-            verticalLines.append([tl, tr, br, bl, cnt])
 
+        if (abs(tl[1]-bl[1]) > vertical.shape[0]//4 and
+          ((tl[0]-bl[0])**2+(tl[1]-bl[1])**2)/((bl[0]-br[0])**2+(bl[1]-br[1])**2) > 500): # rapporto altezza/larghezza linea verticale
+            verticalLines.append({"points":(tl, tr, br, bl), "cnt":cnt})
 
-    verticalLines = sorted(verticalLines, key=lambda l: l[0][0])
+    # ordinamento in base alla distanza rispetto all'asse delle ordinate
+    verticalLines = sorted(verticalLines, key=lambda l: l["points"][0][0])
 
-    tl_prec, bl_prec = verticalLines[0][0], verticalLines[0][3]
-    verticalDistances = list()
-    for i, (tl, tr, br, bl, cnt) in enumerate(verticalLines[1:]):
-        dist = calcDistMiddlePoint((tl, bl),(tl_prec, bl_prec))
-        verticalDistances.append((1+i, dist))
+    distances = list()
+    tl_prec, bl_prec = verticalLines[0]["points"][0], verticalLines[0]["points"][3]
+    # calcolo le distanze tra le linee successive
+    for i, line in enumerate(verticalLines[1:]):
+        tl, tr, br, bl = line["points"]
+        dist = calcDist((tl, bl),(tl_prec, bl_prec))
+        distances.append((1+i, dist)) # indice linea attuale, distanza dalla precedente
         tl_prec, bl_prec = tl, bl
 
-    # verticalDistances = sorted(verticalDistances, key=lambda dist: dist[1])
-    print(verticalDistances)
-
-    RANGE_DIST = vertical.shape[1]/80.0
+    DELTA_DIST_MAX = vertical.shape[1]/80.0 # massima differenza tra 2 distanze
     groups = list()
-    temp = list()
-    for i, dist in verticalDistances:
-        if i in temp: continue
-        group = [i]
-        temp.append(i)
+    lines_checked = list() # linee gia aggiunte
+    # aggrego le linee in gruppi in base alla loro distanza
+    for i, (pos_line1, dist) in enumerate(distances):
+        if pos_line1 in lines_checked: continue
+        group = [pos_line1]
+        lines_checked.append(pos_line1)
         distTot = dist
-        for i2, dist2 in verticalDistances:
-            if i==i2 or i2 in temp: continue
 
-            if abs(dist-dist2) < RANGE_DIST:
+        for pos_line2, dist2 in distances[i+1:]:
+            if pos_line2 in lines_checked: continue
+
+            if abs(dist-dist2) < DELTA_DIST_MAX:
                 distTot += dist2
-                group.append(i2)
-                temp.append(i2)
-        groups.append([group, float(distTot)/len(group)])
+                group.append(pos_line2) # distanza2 simile a distanza1
+                lines_checked.append(pos_line2)
+
+        groups.append((group, float(distTot)/len(group)))
 
     print(groups)
 
-    bestGroup = max(groups, key=lambda g: len(g[0]))
+    bestGroup = max(groups, key=lambda g: len(g[0])) # miglior gruppo quello che contiene piu linee con distanze simili
     distAvg = bestGroup[1]
 
     bugs = list()
-    for i, i_cnt in enumerate(bestGroup[0][:-1]):
-        i_cntNext = bestGroup[0][i+1]
-        if i_cntNext - i_cnt == 1: continue
+    for i, pos_line in enumerate(bestGroup[0][:-1]):
+        pos_next_line = bestGroup[0][i+1]
+        if pos_next_line - pos_line == 1: continue # linee consecutive
 
-        for i, dist in verticalDistances[i_cnt:i_cntNext]:
-            if distAvg-RANGE_DIST < calcDistanceIndexCnt(i, i_cnt, verticalLines) < distAvg+RANGE_DIST:
-                bugs.append(i)
-                i_cnt = i
+        for pos_bug_line,_ in distances[pos_line:pos_next_line-1]:
+            tl1, _, _, bl1 = verticalLines[pos_bug_line]["points"]
+            tl2, _, _, bl2 = verticalLines[pos_line]["points"]
+            if distAvg-DELTA_DIST_MAX < calcDist((tl1, bl1),(tl2, bl2)) < distAvg+DELTA_DIST_MAX:
+                bugs.append(pos_bug_line)
+                pos_line = pos_bug_line
 
-
-    cols = list()
-    for i_cnt in bestGroup[0]+bugs+[0]: # assumiamo che la prima riga sia effettivamente la prima !!! da sistemare
-        cnt = verticalLines[i_cnt][-1]
-
-        rect = cv2.minAreaRect(cnt) # (centrox, centroy), (w,h), angolo
-        box = cv2.cv.BoxPoints(rect) # ottengo vertici rettangolo
-        box = np.int0(box)
-        tl, tr, br, bl = order_points(box)
-        cols.append((tl, tr, br, bl, cnt))
-        # cv2.drawContours(v2, cnt, -1, 255, thickness=-1)
-    cols = map( lambda c: c[-1],
-                sorted(cols, key=lambda c: c[0][0]))
-
+    # ordinamento in base alla distanza rispetto all'asse delle ordinate delle colonne della griglia
+    # [bestGroup[0][0]-1] indice della prima colonna
+    # con map prendo solo i contorni, cio' che mi interessa
+    cols = map( lambda pos_line: verticalLines[pos_line]["cnt"],
+                sorted(bestGroup[0]+bugs+[bestGroup[0][0]-1], key=lambda pos_line: verticalLines[pos_line]["points"][0][0]))
     return cols
 
-def calcDistMiddlePoint(segment1, segment2):
+''' calcola la distanza tra 2 segmenti con la perpendicolare per il punto medio del primo segmento '''
+def calcDist(segment1, segment2):
     p1, p2 = segment1
     p3, p4 = segment2
 
@@ -202,11 +201,12 @@ def calcDistMiddlePoint(segment1, segment2):
         # distanza punto retta
         dist = abs(middlePoint[1] - (m2*middlePoint[0] + q2)) / math.sqrt(1+m2**2)
     else:
-        # retta verticale
+        # distanza punto retta verticale
         dist = abs(p3[0]-middlePoint[0])
 
     return dist
 
+''' calcola il punto medio dei punti di intersezione di riga e colonna '''
 def getIntersectionPoint(intersection):
     contours,_ = cv2.findContours(intersection,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     if not contours: return None
@@ -229,7 +229,7 @@ def findPoints(image):
 
     grid, kernelTransform, cnt_max = findGrid(thresh)
 
-    gridTransformed = adaptGrid(grid, kernelTransform, cnt_max)
+    gridTransformed, kernelTransform = adaptGrid(grid, kernelTransform, cnt_max)
     if show_all: cv2.imshow('gridTransformed', gridTransformed)
 
     rows = getRows(gridTransformed)
@@ -247,32 +247,21 @@ def findPoints(image):
             col_canvas = canvas.copy()
             cv2.drawContours(col_canvas, cnt_c, -1, 255, thickness=1)
 
-            intersection = cv2.bitwise_and(row_canvas, col_canvas)
+            intersections = cv2.bitwise_and(row_canvas, col_canvas)
 
             # ottengo il centro
-            point = getIntersectionPoint(intersection)
-            if point == None: print("Error: %d %d"%(i_r, i_c))
+            point = getIntersectionPoint(intersections)
+            if point == None: print("point (%d, %d) not found"%(i_r, i_c))
             points[i_r][i_c] = point
 
     pp_canvas = canvas.copy()
     for row_points in points:
         for p in row_points:
-            cv2.circle(pp_canvas, p,   0, 255, -1)
-        cv2.imshow("points", pp_canvas)
-        # cv2.waitKey(1000)
+            if p is not None: cv2.circle(pp_canvas, p,   0, 255, -1)
+    cv2.imshow("points", pp_canvas)
+
     return points, pp_canvas, kernelTransform
 
-
-def drawLines(lines, image, color=64):
-    for line in lines:
-        if (line[1]!=0):
-            m = -1/math.tan(line[1])
-            c = line[0]/math.sin(line[1])
-            # print("%d %d"%(0,int(c)))
-            # print("%d %d"%(image.shape[1],int(m*image.shape[1]+c)))
-            cv2.line(image,(0,int(c)),(image.shape[1],int(m*image.shape[1]+c)),color,1)
-        else:
-            cv2.line(image,(int(line[0]),0),(int(line[0]),image.shape[0]),color,1)
 
 def order_points(pts):
 	rect = np.zeros((4, 2), dtype = "float32")
@@ -323,24 +312,26 @@ def extractCells(points, image, kernelTransform):
     blur = cv2.GaussianBlur(image,(11,11),0)
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,5,2)
     threshAdapted = four_point_transform(thresh, kernelTransform)
+    cv2.imshow("thresh2 transformed", threshAdapted)
 
-    gridImages = [[None for __ in range(len(points[0]))] for _ in range(len(points))]
+    cellsImage = [[None for __ in range(len(points[0]))] for _ in range(len(points))]
 
     for r, row_points in enumerate(points[:-1]):
         for c, point1 in enumerate(row_points[:-1]):
-            point2 = points[r+1][c]
-            point3 = points[r][c+1]
-            point4 = points[r+1][c+1]
-            if point1 and point2 and point3 and point4:
+            point2 = points[r][c+1]
+            point3 = points[r+1][c+1]
+            point4 = points[r+1][c]
+            if point1 is not None and point2 is not None and point3 is not None and point4 is not None:
                 cell = np.int0((point1, point2, point3, point4))
+
                 imgCell = four_point_transform(threshAdapted, cell)
-                gridImages[r][c] = imgCell
+                cellsImage[r][c] = imgCell
 
-                cv2.imshow("%d,%d"%(r,c), imgCell)
+                if show_all: cv2.imshow("%d,%d"%(r,c), imgCell)
 
-    return gridImages
+    return cellsImage
 
-''' "raddrizza" l'immagine, il testo, le cifre '''
+''' "raddrizza" l'immagine '''
 def deskew(img):
     m = cv2.moments(img)
     if abs(m['mu02']) < 1e-2:
@@ -376,8 +367,8 @@ def preprocess_hog(digits):
 def preprocess_simple(digits):
     return np.float32(digits).reshape(-1, SZ*SZ) / 255.0
 
-''' elimina bordo esterno, riduce la cella ad una dimensione standard (20), elimina
-celle vuote ciclando su diagonali e verificando minimo numero di pixel pieni '''
+''' elimina il bordo esterno, riduce la cella ad una dimensione standard (20),
+elimina celle vuote '''
 def filterCells(cells):
     cc = list()
     cc_ii = [[None for __ in range(len(cells[0]))] for _ in range(len(cells))]
