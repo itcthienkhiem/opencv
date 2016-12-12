@@ -1,14 +1,29 @@
+# /usr/bin/python
+# gridProcess.py v2
+#
+# Il programma permette di estrarre dei numeri da una griglia presente in un'immagine.
+#
+# In base a come sono scritte le cifre, se a mano o al computer, bisogna fornire
+# un'immagine di training adatta, altrimenti il programma potrebbe non dare i risultati attesi.
+# E' stato tolto da questa versione del programma il metodo1 che trovava le
+# celle in modo diverso. Manca quindi un metodo per trovare le celle che non
+# sono state trovate da questo secondo metodo.
+#
+# Il programma puo' essere eseguito da linea di comando come segue:
+# python gridProcess.py [-h] [-o [OUTPUT_DIR]] [-t [TRAIN_IMG]] [--show_all [SHOW_ALL]] [img]
+# o da un altro programma importando il file e richiamando la funzione getNumbers(_img_).
+
+
 import cv2
 import numpy as np
 from numpy.linalg import norm
 import math, logging, time
 
-logging.basicConfig(filename='sudoku_log', level=logging.DEBUG)
-logging.info("programm starts at %s"%time.strftime("%c"))
-
-global show_all, interactive_mode, _grid, _pointsImage, _cells
+# global variables: show_all, interactive_mode, _output, _train_img, _grid, _pointsImage, _cells
 show_all = False
 interactive_mode = False
+
+logging.basicConfig(filename='grid_process_log', level=logging.DEBUG)
 
 #---------------------------------function--------------------------------------
 ''' assumiamo per semplicita' che la griglia di gioco sia l'oggetto con area
@@ -267,6 +282,7 @@ def findPoints(image):
     thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,7,2)
     if show_all: cv2.imshow('threshold', thresh)
 
+    global _grid
     _grid, kernelTransform, cnt_max = findGrid(thresh)
 
     gridTransformed, kernelTransform = adaptGrid(_grid, kernelTransform, cnt_max)
@@ -442,7 +458,7 @@ def filterCells(cells):
                 if px_found > 4:
                     break
 
-            if px_found > 4:
+            if px_found > 2:
                 cc[r][c] = cell
                 goodCells.append(cell)
                 if show_all: cv2.imshow("%d %d"%(r,c), cell)
@@ -515,17 +531,22 @@ def drawDigits(nn_svm, nn_kn, cc):
 #---------------------------------function--------------------------------------
 ''' avvia l'algoritmo per trovare i numeri posizionati all'interno di una griglia '''
 def getNumbers(img_path):
+    logging.info("------------------------------------------------------------")
+    logging.info("programm starts at %s"%time.strftime("%c"))
+    logging.info("interactive_mode: %s, show_all: %s"%(interactive_mode, show_all))
     logging.info("source img '%s'"%img_path)
 
     try:
         image = cv2.imread(img_path, 0)
         if interactive_mode: cv2.imshow("source image", image)
 
+        global _pointsImage
         points, _pointsImage, kernelTransform = findPoints(image)
         logging.debug("intersection points:\n"+str(points))
 
+        global _cells
         _cells = extractCells(points, image, kernelTransform)
-        nn_svm, nn_kn, goodCells = extractNumbers(_cells)
+        nn_svm, nn_kn, goodCells = extractNumbers(_cells, _train_img)
 
         logging.debug("Numbers calculated with SVM:\n"+str(nn_svm))
         logging.debug("Numbers calculated with KN:\n"+str(nn_kn))
@@ -537,27 +558,30 @@ def getNumbers(img_path):
         logging.critical(str(e))
         sys.exit(1)
 
+    logging.info("programm ends at %s"%time.strftime("%c"))
     return nn_kn
 
 #---------------------------------function--------------------------------------
 ''' salva le immagini risultanti dal procedimento '''
-def saveData(image_src, base_dir="output"):
+def saveData(image_src, output_dir="output"):
     import os
+    if not os.path.exists(output_dir): os.mkdir(output_dir)
+
     folder_name = image_src.split('/')[-1].split('.')[0]
-    folder_path = "%s/%s"%(base_dir, folder_name)
+    folder_path = "%s/%s"%(output_dir, folder_name)
     if not os.path.exists(folder_path): os.mkdir(folder_path)
 
     cv2.imwrite(folder_path+'/grid.png',_grid)
     cv2.imwrite(folder_path+'/points.png',_pointsImage)
 
     cells_path = folder_path+'/cells'
-    if not os.path.exists(folder_path): os.mkdir(cells_path)
+    if not os.path.exists(cells_path): os.mkdir(cells_path)
 
     for r in range(len(_cells)):
         for c in range(len(_cells[0])):
             cell = _cells[r][c]
-            if cell is None: continue
-            cv2.imwrite(cells_path+'/%d_%d.png'%(r,c),cell)
+            if cell is not None:
+                cv2.imwrite(cells_path+'/%d_%d.png'%(r,c),cell)
 
 def main(image_src):
     nn = getNumbers(image_src)
@@ -565,7 +589,7 @@ def main(image_src):
     while 1:
         k = cv2.waitKey(0) & 0xFF
         if k == ord('s'):
-            saveData(image_src)
+            saveData(image_src, _output)
             break
         elif k == 27:
             break
@@ -576,11 +600,22 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='OpenCV. Recognise a grid and extract data cells.')
-    parser.add_argument('img', metavar='img', nargs='?', default="../images/sudoku.jpg", help='image path (current working directory is images)')
-    parser.add_argument('--show_all', dest="show_all", nargs='?', const=True, default=False, help='show all images')
+
+    parser.add_argument('img', metavar='img', nargs='?', default="../images/sudoku.jpg",
+            help='image path (current working directory is "images")')
+    parser.add_argument('-o', '--output', dest="output_dir", nargs='?', default='output',
+            help='output directory of imeges result')
+    parser.add_argument('-t', '--train_img', dest="train_img", nargs='?', default='images/digits.png',
+            help='training digits image')
+    parser.add_argument('--show_all', dest="show_all", nargs='?', const=True, default=False,
+            help='show all images')
+
     args = parser.parse_args()
 
     interactive_mode = True
     show_all = args.show_all
+
+    _output = args.output_dir
+    _train_img = args.train_img
 
     main("../images/%s"%args.img)
